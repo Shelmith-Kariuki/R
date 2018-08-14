@@ -1,0 +1,315 @@
+---
+title: "Interaction Effects"
+author: "Shelmith Nyagathiri Kariuki"
+date: "8/4/2018"
+output: html_document
+---
+
+This markdown document explains what interaction effects are, how to include them in a model and how to explain them. 
+
+The major research questions that we will try to answer are:
+
++ For every age, is there a difference in the mean effectiveness for the three treatments?
+
++ Does the effect of age on the treatment's effectiveness depend on treatment?
+
+We will do this by using a dataset called depression.csv. With this dataset, we are interested in comparing the effectiveness of three treatments (A,B and C) for severe depression. The dataset consists of a sample of n = 36 severely depressed individuals.
+
+Afterwars, we will test our understanding using the leadmoss challenge
+
+##### i). Set working environment
+```{r setup, include=FALSE}
+#-----------------------------------------------------
+
+#-----------------------------------------------------
+# drop all objects from memory
+rm(list = ls())
+
+# disable scientific notation
+options(scipen = 999)
+
+# set working directory
+basedir <- normalizePath("/Users/busara/Documents/Personal Development/R/Interaction_Effects")
+#knitr::opts_knit$set(root.dir = basedir, base.dir = basedir)
+#knitr::opts_chunk$set(echo = TRUE)
+```
+
+#####ii). Loading the required libraries
+```{r,warning=FALSE,message=FALSE}
+# Loading/installing required packages
+pkgs <- c("dplyr","lubridate", "readxl", "readr", "stringr", "tidyr", "openxlsx", 
+          "purrr", "Hmisc", "ggthemes", "extrafont","kableExtra")
+
+miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]] # vector of missing packages
+
+# Installing the missing packages
+if(length(miss_pkgs)>0){
+  install.packages(miss_pkgs)
+}
+
+# Loading all the packages
+invisible(lapply(pkgs,library,character.only=TRUE))
+```
+
+#####iii). Set theme
+```{r}
+int_theme<-theme(legend.position = "bottom",
+                  legend.title = element_blank(),
+  axis.line=element_blank(),
+  plot.title = element_text(family="Source Sans Pro Semibold", 
+                            size = rel(1.2), hjust = 0.5),
+  plot.subtitle = element_text(size = rel(1), hjust = 0.5),
+  axis.text = element_text(family = "Source Sans Pro", size = rel(1.2)),
+  axis.text.x = element_text(vjust = 1, hjust = 0.6),
+  axis.title = element_text(family = "Source Sans Pro Semibold", size = rel(1)),
+  legend.text = element_text(family = "Source Sans Pro", size = rel(1.2)),
+  panel.background = element_rect(fill = NA))
+```
+
+##### 1.Read in the dataset
+```{r}
+depression.df<-read.csv(paste(basedir,"Depression.csv",sep = "/"))
+kable_styling(kable(depression.df),bootstrap_options = "striped", full_width = F)
+
+```
+
++ $y_{i}$ = measure of the effectiveness of the treatment for individual i
+
++ $X_{i1}$ = age (in years) of individual i
+
++ $X_{i2}$ = 1 if individual i received treatment A and 0, if not
+
++ $X_{i3}$ = 1 if individual i received treatment B and 0, if not
+
++ $X_{i2}$ =0 and $X_{i3}$=0, implies that one received treatment C.
+
+
+##### 2. Scatter plot showing the relationship between age and y, for the different treatments
++ A scatter plot of the data with treatment effectiveness on the y-axis and age on the x-axis looks like this:
+
+```{r}
+scatter_plot =depression.df%>%
+  ggplot(aes(x=age,y=y,group = TRT,color=TRT))+ 
+  geom_point(size = 3)+
+  int_theme+
+  theme(legend.position = "bottom",
+        legend.title = element_blank())+
+  scale_color_manual(values = c("red","blue","black"))+
+labs(title ="Scatter Plot of y vs age",x = "age", y = "y")
+scatter_plot
+```
+
+
++ The red circles represent the data for individuals receiving treatment A, the blue circles represent the data for individuals receiving treatment B, and the black circles represent the data for individuals receiving treatment C.
+
++ If we tried to draw three best fitting lines through the data of this example, the slopes of the lines would not be the same. We need to include what are called **interaction terms** in our formulated regression model.
+
++ A (second-order) multiple regression model with interaction terms is:
+
+$$y_i=\beta_0+\beta_1x_{i1}+\beta_2x_{i2}+\beta_3x_{i3}+\beta_{12}x_{i1}x_{i2}+\beta_{13}x_{i1}x_{i3}+\epsilon_i$$
+
+where:
+
++ $y_{i}$ = measure of the effectiveness of the treatment for individual i
+
++ $X_{i1}$ = age (in years) of individual i
+
++ $X_{i2}$ = 1 if individual i received treatment A and 0, if not
+
++ $X_{i3}$ = 1 if individual i received treatment B and 0, if not
+
+
+and the independent error terms $\epsilon_i$ follow a normal distribution with mean 0 and equal variance $\\σ2$. Perhaps not surprisingly, the terms $x_{i1}x_{i2}$ and $x_{i1}x_{i3}$ are the interaction terms in the model.
+
++ This model defines three different regression functions, one for each of the three treatments:
+
++   If patient receives A, then ($X_{i2}$ = 1, $X_{i3}$ = 0) and
+$\mu_Y=(\beta_0+\beta_2)+(\beta_1+\beta_{12})x_{i1}$
+
++   If patient receives B, then ($X_{i2}$ = 0, $X_{i3}$ = 1) and $\mu_Y=(\beta_0+\beta_3)+(\beta_1+\beta_{13})x_{i1}$
+
++   If patient receives C, then ($X_{i2}$ = 0, $X_{i3}$ = 0) and 
+$\mu_Y=\beta_0+\beta_{1}x_{i1}$
+
+
++ The slopes of the three regression functions differ i.e the slope of the first line is $(\beta_1+\beta_{12})$, the slope of the second line is $(\beta_1+\beta_{13})$, and the slope of the third line is $(\beta_1)$.
+
++ The effect of the individual's age ($X_{1}$) on the treatment's mean effectiveness (μY) depends on the treatment ($X_{2}$) and ($X_{3}$), and 
+the effect of treatment ($X_{2}$) and ($X_{3}$) on the treatment's mean effectiveness ($\mu_Y$) depends on the individual's age ($X_{1}$).
+
++ Two predictors interact if the effect on the response variable of one predictor **depends on the value of the other**.
+
++ A regression model contains interaction effects if the response function is not additive and cannot be written as a sum of functions of the predictor variables. That is, a regression model contains interaction effects if:
+
+$$\mu_Y \ne f_1(x_1)+f_1(x_1)+ \cdots +f_{p-1}(x_{p-1})$$
+
+##### 3. Fitting the model
+```{r}
+model1<-lm(y~age+x2+x3+age*x2+age*x3,data = depression.df)
+summary(model1)
+```
+The equation of this model is:
+
+$$y_i=6.21138+1.03339age+41.30421x_{i2}+22.70682x_{i3}-0.70288agex_{i2}-0.50971agex_{i3}$$
+
++ Now, if we plug the possible values for ($X_{2}$) and ($X_{3}$) into the estimated regression function, we obtain the three "best fitting" lines —one for each treatment (A, B and C) , through the data.
+
++   If patient receives A, then ($X_{i2}$ = 1, $X_{i3}$ = 0) and
+$\hat{y}=47.5+0.33x_1$
+
++   If patient receives B, then ($X_{i2}$ = 0, $X_{i3}$ = 1) and $\hat{y}=28.9+0.52x_1$
+
++   If patient receives C, then ($X_{i2}$ = 0, $X_{i3}$ = 0) and 
+$\hat{y}=6.21+1.03x_1$
+
+What do the estimated slopes tell us?
+
++ For patients in this study receiving treatment A, the effectiveness of the treatment is predicted to increase 0.33 units for every additional year in age.
+
++ For patients in this study receiving treatment B, the effectiveness of the treatment is predicted to increase 0.52 units for every additional year in age.
+
++ For patients in this study receiving treatment C, the effectiveness of the treatment is predicted to increase 1.03 units for every additional year in age.
+
++ In short, the effect of age on the predicted treatment effectiveness depends on the treatment given. That is, age appears to interact with treatment in its impact on treatment effectiveness.
+
++ This interaction effect would be exhibited by plotting the three fitted regression lines, on the plot, and observing that they are not parallel. 
+
+#####4. Evaluating the model
+
+```{r}
+plot(model1)
+```
+
+The residuals versus fits plot suggests that the model fits well, and there are no obvious outliers, and the error variances are indeed constant.
+
+The normal probability plot exhibits linear trend, suggesting that the error terms are indeed normally distribute.
+
+
+#####5. Question 1:For every age, is there a difference in the mean effectiveness for the three treatments?
+
+
+We need to test the null hypothesis: 
++  $H_0 : \beta_2 = \beta_3 = \beta_{12} = \beta_{13} = 0$ against the alternative
+
++  $H_A$ : at least one of these slope parameters is not 0.
+```{r}
+anova(model1)
+```
+
+
+$$F=\frac{(803.8+1.2+375+328.42)/4}{15.4}=24.49$$
+```{r}
+##Obtaining F Tabulated value
+qf(0.95,4,30)
+```
+
++ Since the significant value of an F distribution with 2 degrees of freedom in the numerator, and 30 degrees of freedom in the denominator (F Table),is (2.689628),which is less than  (F Calculated) (24.49) , the F Calculated is in the rejection region, and hence we reject the null hypothesis, and conclude that there is sufficient evidence, at 0.05 confidence level, that there is significant difference in the mean effectiveness for the three treatments.
+
+
+
+#####6. Question 2:Does the effect of age on the treatment's effectiveness depend on treatment?
+
+
++ Answering the question involves testing whether the two interaction parameters $\beta_{12}$ and $\beta_{13}$ are significant.
+
++ We need to test the null hypothesis:
+
+$H_0 : \beta_{12} = \beta_{13}$ against the alternative
+
+$H_A$ : at least one of the interaction parameters is not 0.
+
+$$F=\frac{(375+328.42)/2}{15.4}=22.84$$
+The significant value is obtained as follows:
+```{r}
+##Obtaining F Tabulated value
+
+qf(0.95,2,30)
+```
+
++ Since the significant value of an F distribution with 2 degrees of freedom in the numerator, and 30 degrees of freedom in the denominator (F Table),is (3.31583),which is less than  (F Calculated) (22.84) , the F Calculated is in the rejection region, and so we  reject the null hypothesis, and conclude that there is sufficient evidence, at 0.05 confidence level, that the effect of age on the treatment's effectiveness depends on the treatment given.
+
+
+#####7. Leadmoss challenge
+
++ A study of atmospheric pollution on the slopes of the Blue Ridge Mountains (Tennessee) was conducted. The leadmoss dataset contains the levels of lead found in 70 fern moss specimens (in micrograms of lead per gram of moss tissue) collected from the mountain slopes, as well as the elevation of the moss specimen (in feet) and the direction (1 if east, 0 if west) of the slope face.
+
+
+```{r}
+leadmoss.df<-read.csv(paste(basedir,"lead_moss.csv",sep = "/"))
+kable_styling(kable(leadmoss.df),bootstrap_options = "striped", full_width = F)
+
+```
+
+
++ Question 1. Write the equation of a second-order model relating mean lead level, E(y), to elevation (x1) and the slope face (x2) that includes an  interaction between elevation and slope face in the model.
+
+$$y_i=\beta_0 +\beta_{1}x_{i1}+\beta_{2}x_{i2}+\beta_{12}x_{i1}x_{i2}$$
++ where:
++ $y_i$ is the mean lead level
+
++ $x_{i1}$ is the elavation
+
++ $x_{i2}$ is the slope face
+
++ $x_{i1}x_{i2}$ is the interaction term, signifying the interaction between elavation and slope
+
+
++ Question 2. Graph the relationship between mean lead level and elevation for the different slope faces that is hypothesized by the model in Question 1.
+
+```{r}
+scatter_plot2 =leadmoss.df%>%
+  ggplot(aes(x=x1,y=y,group = as.factor(x2),color=as.factor(x2)))+ 
+  geom_point(size = 3)+
+  int_theme+
+  theme(legend.position = "bottom",
+        legend.title = element_blank())+
+  scale_color_manual(values = c("red","blue"))+
+labs(title ="Scatter Plot of y vs elavation",x = "elavation", y = "y")
+scatter_plot2
+```
+
++ Question 3. In terms of the β's of the model in Question 1, give the change in lead level for every one foot increase in elevation for moss specimens on the east slope.
+
+$$y_i=\beta_0 +\beta_{1}x_{i1}+\beta_{2}+\beta_{12}x_{i1}$$
+$$y_i=(\beta_0+\beta_{2}) +(\beta_{1}+\beta_{12})x_{i1}$$
+
++ Average so average lead level changes by $(\beta_{1}+\beta_{12})$ micrograms of lead per gram of moss tissue for every one foot increase in elevation for moss specimens on the east slope.
+
++ Question 4. Fit the model in Question 1 to the data using an available statistical software package. Is the overall model statistically useful for predicting lead level? Test using α = 0.10.
+
+```{r}
+model2<-lm(y~x1+x2+x1*x2,data = leadmoss.df)
+summary(model2)
+anova(model2)
+```
++ We need to test the null hypothesis: 
+
++  $H_0 :\beta_1= \beta_2 = = \beta_{12} = 0$ against the alternative
+
+
++  $H_A$ : at least one of these slope parameters is not 0.
+
+$$F=\frac{(14.96+0.23+5.05)/3}{26.3346}=0.2561902$$
+
+
+```{r}
+##Obtaining F Tabulated value
+
+qf(0.9,3,66)
+```
+
++ Since F Calculated (0.2561902) is less than F Table value (2.168697), the F Calculated is not in the rejection region (also, the p-value of th F-Statistic is 0.8567 >0.05), and so we cannot reject the null hypothesis. The overall model is not statistically useful for predicting lead level.
+
+
++ Question 5. Write the estimated equation of the model in Question 3 relating mean lead level, E(y), to elevation (x1) and slope face (x2).
+
+$$y_i=2.384866 +0.001809x_{1}+3.201458x_{2}-0.001326x_{i1}x_{i2}$$
++Evaluate the Model
+
+```{r}
+plot(model2)
+```
+
+
+
++ The plots show that the model is not of good fit
