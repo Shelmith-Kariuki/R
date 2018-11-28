@@ -44,12 +44,12 @@ loans_df3 <- loans_df %>%
 #### Example 1: Select all females who are graduates
 
 female_graduates <- loans_df %>%
-  filter(Gender == "Female" & Education == "Graduate")
+  filter(Gender == "Female" | Education == "Graduate")
 
 #### Example 2: Select all loan applicants who have a loan greater 
   ##### than 10,000 and have not repaid it yet.
 loan_nonrepaid <- loans_df %>%
-  filter(LoanAmount < 10000 & Loan_Status == "N")
+  filter(LoanAmount > 10000 & Loan_Status == "N")
 
 ###3. mutate() :
 
@@ -89,6 +89,8 @@ rural_perc <- loans_df %>%
 ### spread() : Converts data from long to wide.
 ### gather() : Converts data from wide to long.
 
+## Install the tidyr package
+
 ## Loading the tidyr package.
 library(tidyr)
 
@@ -109,7 +111,7 @@ treatment_df <- data.frame(Region, Control, Treatment1_GoldCoin,Treatment2_Messa
 ### Example 1
 
 treatment_df_long <- treatment_df %>%
-  gather(Treatment_Category, No_of_Respondents, -Region)
+  gather(Treatment_Category, No_of_Respondents, Control, Treatment1_GoldCoin,Treatment2_Messages)
 
 ###Quiz1: How many repondents are in the control group, in total?
 ###Quiz2: Where do most of the respondents come from?

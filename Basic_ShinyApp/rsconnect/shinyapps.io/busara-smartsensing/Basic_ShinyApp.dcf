@@ -1,0 +1,12 @@
+name: Basic_ShinyApp
+title: Basic_ShinyApp
+username:
+account: busara-smartsensing
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 376807
+bundleId: 1471545
+url: https://busara-smartsensing.shinyapps.io/Basic_ShinyApp/
+when: 1531144770.89404
+asMultiple: FALSE
+asStatic: FALSE

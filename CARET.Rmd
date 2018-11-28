@@ -1,0 +1,391 @@
+---
+title: "CARET"
+author: "Shelmith Kariuki"
+date: "11/27/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+basedir <- normalizePath("/Users/shelmith/Documents/Work Projects/internal_challenge/")
+
+```
+
+
+CARET stands for *C*lassification *a*nd *R*egression *T*raining. 
+
+CARET can be used for:
+
++ Data Preparation and PreProcessing.
+
++ Visualizing the importance of Variables.
+
++ Feature selection.
+
++ Training and Tuning Models.
+
++ Ensembling the Predictions.
+
+No matter which package an algorithm resides, CARET will fetch it for you. You just need to ensure that you have that package installed. 
+
+```{r,echo=FALSE, warning=FALSE,message=FALSE,include=FALSE}
+#####ii). Loading the required libraries
+
+rm(list=ls())
+# Loading/installing required packages
+pkgs <- c('caret', 'skimr', 'RANN', 'randomForest', 'fastAdaboost', 'gbm', 'xgboost', 'caretEnsemble', 'C50', 'earth',"coin")
+
+miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]] # vector of missing packages
+
+# Installing the missing packages
+if(length(miss_pkgs)>0){
+  install.packages(miss_pkgs)
+}
+
+# Loading all the packages
+invisible(lapply(pkgs,library,character.only=TRUE))
+rm(miss_pkgs)
+rm(pkgs)
+
+```
+
+
+```{r,echo=FALSE, warning=FALSE,message=FALSE,include=FALSE}
+
+# Set the theme
+ic_theme<-theme(legend.position = "bottom",
+                  legend.title = element_blank(),
+  axis.line=element_blank(),
+  plot.title = element_text(family="Source Sans Pro Semibold", 
+                            size = rel(1.2), hjust = 0.5),
+  plot.subtitle = element_text(size = rel(1), hjust = 0.5),
+  axis.text = element_text(family = "Source Sans Pro Semibold", size = rel(0.9)),
+  axis.text.x = element_text(vjust = 1, hjust = 0.6),
+  axis.title = element_text(family = "Source Sans Pro Semibold", size = rel(1.0)),
+  legend.text = element_text(family = "Source Sans Pro Semibold", size = rel(1.0)),
+  panel.background = element_rect(fill = NA))
+```
+
+#### Reading in the data
+
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE,include=FALSE}
+train_data<-read.csv("/Users/shelmith/Documents/Work Projects/internal_challenge/train.csv")
+test_data<-read.csv("/Users/shelmith/Documents/Work Projects/internal_challenge/test.csv")
+
+## Combine both train and test data
+train_data$data_type = "train_data"
+test_data$data_type = "test_data"
+test_data$ID <-NULL
+
+#challenge_data <-bind_rows(train_data,test_data)
+```
+
+The train dataset has `r nrow(unique(train_data))` unique records and the test dataset has `r nrow(unique(test_data))` unique records. 
+
+#### Remove the duplicates
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE,include=FALSE}
+
+train_data<-train_data%>%
+  unique()
+```
+
+#### Convert the ? to NA and categorical variables to factors.
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE,include=FALSE}
+
+
+for( i in 1:length(train_data)){
+  train_data[,i]<-ifelse(as.character(trimws(train_data[,i]))=="?",NA,as.character(train_data[,i]))
+}
+
+factor_vars<-c("workclass","education","marital.status","occupation","relationship","race",
+               "sex","native.country","over50","data_type")
+
+for( i in 1:length(factor_vars)){
+  train_data[,factor_vars[i]]<-as.factor(train_data[,factor_vars[i]])
+}
+
+num_vars<-names(train_data)[!names(train_data)%in%factor_vars]
+
+for( i in 1:length(num_vars)){
+  train_data[,num_vars[i]]<-as.numeric(train_data[,num_vars[i]])
+}
+```
+
+#### Visualising missingness.
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE}
+## First examine the percentage of missingness in each variable
+
+miss_df <-data.frame(sapply(train_data,function(x) sum(is.na(x))))
+
+
+train_data_aggr = aggr(train_data, col=mdc(1:2), numbers=TRUE, sortVars=TRUE, labels=names(train_data), cex.axis=.7, gap=3, ylab=c("Proportion of missingness","Missingness Pattern"))
+train_data_aggr
+```
+
+#### Testing the type of missingness
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE,include=FALSE}
+## Generate a new variable that indicates whether a missing value is missing or not in each of the three variables that are highly missing.
+train_data$miss_occupation <-ifelse(is.na(train_data$occupation),1,0)
+train_data$miss_workclass <-ifelse(is.na(train_data$workclass),1,0)
+train_data$miss_nativecountry <-ifelse(is.na(train_data$native.country),1,0)
+
+yvars<-c("Age","education.num","capital.gain","capital.loss","hours.per.week")
+xvars<-c("miss_occupation","miss_workclass","miss_nativecountry")
+
+vars<-expand.grid(x = xvars, y = yvars)
+x<-""
+y<-""
+p_value<-0
+gr1_mean<-0
+gr2_mean<-0
+
+for(i in 1: length(vars$x)){
+    x[i]<-as.character(vars$x[i])
+    y[i]<-as.character(vars$y[i])
+    p_value[i]<-t.test(as.numeric(train_data[,as.character(vars$y[i])]) ~train_data[,as.character(vars$x[i])])$p.value
+    gr1_mean[i]<-t.test(as.numeric(train_data[,as.character(vars$y[i])])~train_data[,as.character(vars$x[i])])$estimate[1]
+    gr2_mean[i]<-t.test(as.numeric(train_data[,as.character(vars$y[i])])~train_data[,as.character(vars$x[i])])$estimate[2]}
+
+ttest_df <-data.frame(x,y,p_value,gr1_mean,gr2_mean)
+
+train_data$miss_occupation<-NULL
+train_data$miss_workclass<-NULL
+train_data$miss_nativecountry<-NULL
+
+```
+
+#####1. Split data into 80% train and 20% test data. 
+
+This is possible using createDataPartition(). Using this function, as opposed to the sample() function is better, since it preserves the proportion of the categories in the dependent variable, which can be disturbed, if one used the sample() function.
+
+So, what is the difference between train data and test data? Train data is used to learn the relationship between the dependent and the independent variables.  The result of this is a machine learning model.
+
+Test data is used to evaluate the perfomance of the model.
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE,results='asis'}
+## Set the seed value
+###set.seed(737) # This ensures that the results are replicable in each run.
+
+## Get row numbers of the train data
+###train_rows <-createDataPartition(data,p=0.8,list=False)
+
+### p=0.8: We want to sample 80% of the data, to be used as train data.
+
+## Generate the train and test data
+###train_data<-data[train_rows]
+###test_data<-data[-train_rows]
+
+```
+
+#####2. Impute the missing values
+
+Imputing means filling up the missing values with some meaningful values. 
+
+The *best* (Best according to Shelmith) method of imputation is predicting the missing values by considering the rest of the available variables as predictors.
+
+A popular method is the K-Nearest Neighbours method. The preProcess() function is used for imputation, as well as other data processing techniques.
+
+The preProcess() function takes in two arguements: the training data and the method of imputation, in our case, K-NN imputation.
+
+Every data processing technique involves two functions. First one is the preProcess function that creates a data processing model. The other is the predict() function that implements the preProcess model on the train data. 
+
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE,results='asis'}
+# impute_model = preProcess(train_data[,c(-15,-16)],method = "knnImpute")
+# impute_model
+
+```
+
+The results of this indicate that the data contains 6 independent continuous variables that were centered (subtracting the mean) and scaled (division by standard deviation).
+
+All the other variables(10) are categorical, so they are ignored (meaning that they are not centered and scaled).
+
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE,results='asis'}
+# train_data[,c(-15,-16)]<-predict(impute_model,train_data[,c(-15,-16)])
+# anyNA(train_data)
+
+train_data <- VIM::kNN(train_data, c("occupation", "workclass", "native.country"))
+anyNA(train_data)
+
+```
+#####3. One hot encoding (dummy variables).
+
+Creating dummy variables is the process of converting a categorical variable to as many dummy variables as there are categories.
+
+dummyVars() function is used to create the dummy variables.
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE,results='asis'}
+
+dummies_model <- dummyVars(over50~.,data = train_data[,-16])
+train_data2<-data.frame(predict(dummies_model,train_data[,-16]))
+
+```
+
+#####4. Other types of data preprocessing
+
+range: Normalize values to range between 0 and 1
+center: Subtract mean
+scale: Divide by standard deviation
+BoxCox: Remove skewness leading to normality (for values > 0)
+YeoJohnson: Like BoxCox, but for values <0
+expoTrans: Exponential Transformation (for values < 0)
+pca: Replace with pca values
+
+#####5. Carry ot some feature selection
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE,results='asis'}
+## Rebucket the work class variable
+train_data <- train_data %>%
+  mutate(workclass = ifelse(as.character(workclass) %in% grep("gov",as.character(workclass),value = T),"Government",
+                    ifelse(as.character(workclass) %in% grep("Self",as.character(workclass),value = T),"Self Employed",
+                    ifelse(as.character(workclass) %in% grep("Without-pay|Never",as.character(workclass),value = T),"Unemployed",as.character(workclass)))))
+
+
+## Convert hours worked per week into a categorical variable
+train_data <-train_data%>%
+  mutate(hours.per.week = ifelse(hours.per.week < 40,"Less than 40",
+                          ifelse(hours.per.week >= 40 & hours.per.week <= 45,"40-45",
+                          ifelse(hours.per.week > 45 & hours.per.week <= 60,"45-60",
+                          ifelse(hours.per.week > 60 & hours.per.week <= 80,"60-80",
+                          ifelse(hours.per.week > 80,"Greater than 80",hours.per.week))))))
+
+train_data <-train_data%>%
+  mutate(hours.per.week = factor(hours.per.week,
+                             levels = c("Less than 40","40-45","45-60","60-80","Greater than 80"),
+                             labels = c("Less than 40","40-45","45-60","60-80","Greater than 80")))
+
+## Generate a continent variable
+
+train_data <- train_data %>%
+  mutate(continent = ifelse(trimws(as.character(native.country)) %in% grep(c("Cambodia|China|Hong|Laos|Thailand
+               |Japan|Taiwan|Vietnam|India|Iran|Philippines"),trimws(as.character(native.country)),value = T),"Asia",
+               
+                  ifelse(trimws(as.character(native.country)) %in% grep(c("Cuba|Guatemala|Jamaica|Nicaragua|Puerto-Rico|Dominican-Republic|El-Salvador|Haiti|Honduras|Mexico|Trinadad&Tobago|United-States|Haiti|Columbia|Canada|US|Peru|Ecuador|South"),trimws(as.character(native.country)),value = T),"America",
+                         
+                  ifelse(trimws(as.character(native.country)) %in%
+grep(c("England|Germany|Holand-Netherlands|Ireland|France|Greece|Italy|Portugal|Scotland|Poland|Yugoslavia|Hungary|Thailand"),
+     trimws(as.character(native.country)),value = T),"Europe",as.character(native.country)))))
+train_data$continent<-as.factor(train_data$continent)
+
+
+##Generate a new education variable
+
+train_data <- train_data %>%
+  mutate(education2 = ifelse(trimws(as.character(education)) %in% 
+grep(c("th"),trimws(as.character(education)),value = T),"Primary",as.character(education)))
+
+train_data$education2<-as.factor(train_data$education2)
+
+```
+
+#####6. Visualize importance of variables
+
+The function used to visualize importance of variables is featurePlot().
+
+Question: How do you visualize if X(an explanatory variable) is a good/important predictor of Y(a dependent variable)?
+
+If you group the X variable  by the categories of Y, there should be a significant mean shift, amongst the X's groups. This can be tested using t-tests. It can also be visualized using box plots or density plots.
+
+If X is a categorical variable, you can carry out proportional tests to check if there is a difference in proportions of Y, for the different categories of Y.
+
+#####6.1 Continuous variables
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE,results='asis'}
+
+yvars<-c("Age","education.num","capital.gain","capital.loss")
+xvars<-c("over50")
+
+vars<-expand.grid(x = xvars, y = yvars)
+
+x<-""
+y<-""
+p_value<-0
+gr1_less50k<-0
+gr2_greater50k<-0
+
+for(i in 1: length(vars$x)){
+    x[i]<-as.character(vars$x[i])
+    y[i]<-as.character(vars$y[i])
+    p_value[i]<-t.test(as.numeric(train_data[,as.character(vars$y[i])]) ~train_data[,as.character(vars$x[i])])$p.value
+    gr1_less50k[i]<-t.test(as.numeric(train_data[,as.character(vars$y[i])])~train_data[,as.character(vars$x[i])])$estimate[1]
+    gr2_greater50k[i]<-t.test(as.numeric(train_data[,as.character(vars$y[i])])~train_data[,as.character(vars$x[i])])$estimate[2]}
+
+ttest_df2 <-data.frame(x,y,p_value,gr1_less50k,gr2_greater50k)
+
+```
+
+
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE,results='asis'}
+
+t<-featurePlot(x = train_data[, num_vars], 
+            y = train_data$over50, 
+            plot = "box",
+            strip=strip.custom(par.strip.text=list(cex=.7)),
+            scales = list(x = list(relation="free"), 
+                          y = list(relation="free")))
+
+
+
+```
+
+#####6.2 Categorical variables
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE,results='asis'}
+trial = train_data %>%
+  dplyr::group_by(over50, marital.status)%>%
+  dplyr::summarise(count = n())%>%
+  spread(over50,count)%>%
+  mutate(total = ` <=50K.`+` >50K.`)
+
+prop.test(trial$` >50K.`, trial$total)
+
+
+yvars<-factor_vars[c(-9,-10)]
+factor_vars<-c("education2","hours.per.week","continent", factor_vars)
+xvars<-c("over50")
+
+vars<-expand.grid(x = xvars, y = yvars)
+
+x<-""
+y<-""
+p_value<-0
+
+
+for(i in 1: length(vars$x)){
+  
+    x[i]<-as.character(vars$x[i])
+    y[i]<-as.character(vars$y[i])
+    
+  trial = train_data %>%
+  dplyr::group_by_(.dots = c("over50", yvars[i]))%>%
+  dplyr::summarise(count = n())%>%
+  spread(over50,count)%>%
+  mutate(total = ` <=50K.`+` >50K.`)
+  
+p_value[i] = prop.test(trial$` >50K.`, trial$total)$p.value
+
+Tabla<-prop.table(table(train_data$over50,train_data[,yvars[i]]),margin = NULL) 
+
+print(spineplot(Tabla))
+
+}
+
+proptest_df <-data.frame(x,y,p_value)
+print(kable_styling(kable(proptest_df),bootstrap_options = "striped", full_width = F))
+
+```
+
+#####7. Train the model
+
+```{r,echo=TRUE, warning=FALSE,message=FALSE,results='asis'}
+```
+
+
+
