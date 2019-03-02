@@ -1,0 +1,229 @@
+---
+title: <center><strong> "Data Fest Kampala (R Training)"</strong></center>
+author: <center><strong>"Shelmith Nyagathiri Kariuki"</strong></center>
+date: <center><strong>"March 2, 2019"</strong></center>
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE, fig.cap="", out.width = '100%'}
+rm(list = ls())
+knitr::include_graphics("C:/Users/user/Documents/Github/R/Images/DFK Image.PNG")
+```
+
+#### Introduction
+
+Talk about Zindi here,and introduce the Data Science Nigeria challenge. 
+
+#### Load the libraries (packages) required
+
+<br>
+```{r,echo=TRUE, warning=FALSE,message=FALSE,include=TRUE}
+
+## Create a vector of the required libraries
+  ### dplyr: Manipulating datasets
+  ### lubridate: Dealing with dates
+  ### tidyr: Reshaping data
+  ### ggplot: Plotting beautiful plots
+
+pkgs <- c("dplyr","lubridate","tidyr","ggplot2","stringr","kableExtra")
+
+
+## Check if there are variables you want to load, that are not already installed. 
+miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]] # vector of missing packages
+
+## Installing the missing packages
+if(length(miss_pkgs)>0){
+  install.packages(miss_pkgs)
+}
+
+## Loading all the packages
+invisible(lapply(pkgs,library,character.only=TRUE))
+
+## Remove the objects that are no longer required
+rm(miss_pkgs)
+rm(pkgs)
+rm(vars)
+```
+
+#### Setting my plot theme
+<br>
+```{r,warning=FALSE, message=FALSE,echo=TRUE}
+kampala_theme<-  theme(legend.position = "right", 
+                 legend.direction = "vertical",
+                 legend.title = element_blank(),
+                 plot.title = element_text( size = rel(1.4), hjust = 0.5),
+                plot.subtitle = element_text(size = rel(1.4), hjust = 0.5),
+                 #axis.text = element_text( size = rel(1.5)),
+                 axis.text.x = element_text(size =rel(1.3),angle = 0),
+                 axis.text.y = element_text(size =rel(1.3),angle = 0),
+                 axis.title = element_text( size = rel(1.3)),
+                 panel.background = element_rect(fill = NA))
+
+```
+
+#### Read in the datasets
+<br>
+```{r,warning=FALSE, message=FALSE,echo=TRUE}
+
+# df <- read.csv("C:/Users/user/Documents/Github/R/Datasets/DSN Zindi LoanDataset/traindemographics.csv")
+
+## List the files that are in that directory
+
+dsn_challenge_files <-list.files("C:/Users/user/Documents/Github/R/Datasets/DSN Zindi LoanDataset",pattern = ".csv")
+dsn_challenge_files
+
+## Generate an empty list that will hold the datasets
+
+dsn_challenge <- list()
+
+## Read in the datasets
+
+for(i in 1: length(dsn_challenge_files)){
+  
+  ## Read in each dataset, one by one
+  dsn_challenge[[i]]<-read.csv(paste("C:/Users/user/Documents/Github/R/Datasets/DSN Zindi LoanDataset/", dsn_challenge_files[i],sep = ""))
+  
+  ## Remove the ".csv" from the name
+  dsn_challenge_files[i] <- gsub(".csv","",dsn_challenge_files[i])
+  
+  ## Assign each dataset a name, as is in the directory
+  assign(dsn_challenge_files[i], dsn_challenge[[i]])
+
+}
+
+## Remove the objects that we do not need
+
+rm(i)
+rm(dsn_challenge)
+rm(dsn_challenge_files)
+
+```
+
+#### Handling duplicates
+<br>
+```{r,warning=FALSE, message=FALSE,echo=TRUE}
+
+## Check whether the traindemographic dataset has unique customer ids
+length(unique(traindemographics$customerid))
+
+## Inspect the duplicate records
+which(duplicated(traindemographics$customerid))
+
+## View(traindemographics$customerid[which(duplicated(traindemographics$customerid))])
+
+## Drop the duplicates, and only keep unique records
+traindemographics <- traindemographics %>% 
+  unique()
+```
+
+#### Generating more demographic variables
+<br>
+```{r,warning=FALSE, message=FALSE,echo=TRUE}
+
+## set.seed ensures that the sampling code is reproducible
+set.seed(7032018)
+
+
+## Generate gender
+gender<- sample(c("Male","Female"), nrow(traindemographics), replace = T)
+traindemographics$gender <- gender
+
+## Generate State
+state <- sample(c("Oyo","Bauchi","Enugu","Lagos","Ogun","Kadun"), nrow(traindemographics),replace = T)
+traindemographics$gender<-gender
+
+## Age
+  ### Convert to character
+traindemographics$birthdate<-as.character(traindemographics$birthdate)
+
+  ### Split the string variable o remove unnecessary information
+traindemographics$birthdate<-substr(traindemographics$birthdate,1,10)
+
+  ### Convert the data to date format
+traindemographics$birthdate <- ymd(traindemographics$birthdate)
+
+  ### Generate age
+traindemographics$age<-as.numeric(ceiling(difftime(ymd(20180101),traindemographics$birthdate,"days")/365))
+
+
+```
+
+#### Generating new variables, based on conditions of another variable
+<br>
+```{r,warning=FALSE, message=FALSE,echo=TRUE}
+
+## Age Categories
+traindemographics <- traindemographics %>% 
+  mutate(age_category = ifelse(age>=21 & age<=30,"21-30",
+                         ifelse(age>=31 & age<=40,"31-40",
+                         ifelse(age>=41 & age<=60,"41-60",""))))
+table(traindemographics$age_category)
+```
+
+#### Generating summary statistics for one categorical variables
+<br>
+```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
+## Age
+
+### Generate a summary statistics table
+summ_table <- traindemographics %>% 
+  group_by(age_category) %>% 
+  summarise(count = n()) %>% 
+  mutate(perc = round((count/sum(count))*100,0))
+
+### Print the summary statistics table
+print(kable_styling(kable(summ_table,col.names = c("Age Categories","Frequency","Percentage"))))
+
+### Generate a graph based on the summary table shown above
+
+summ_graph <- ggplot(summ_table, aes(x=age_category,y=perc))+
+              geom_bar(stat = "identity", fill="brown")+
+              kampala_theme+
+              labs(title = "Distribution of Age",x="Age Categories",
+                   y="Percentage")
+summ_graph
+```
+
+#### Generating summary statistics for several categorical variables
+
+```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
+
+## Generate a function that produces a table, and a graph
+summ_function <- function(xvar, xlab,title){
+  
+  ### Generate a summary statistics table
+summ_table <- traindemographics %>% 
+  group_by_(xvar) %>% 
+  summarise(count = n()) %>% 
+  mutate(perc = round((count/sum(count))*100,0))
+
+### Print the summary statistics table
+print(kable_styling(kable(summ_table,col.names = c(xlab,"Frequency","Percentage"))))
+
+### Generate a graph based on the summary table shown above
+
+summ_graph <- ggplot(summ_table, aes_string(x=xvar,y="perc"))+
+              geom_bar(stat = "identity", fill="brown")+
+              kampala_theme+
+              labs(title = paste("Distribution of",title),x=xlab,
+                   y="Percentage")
+print(summ_graph)
+  
+}
+
+## Generate a vector containing tha variables whose summary statistics you want to obtain.
+
+vars<- c("bank_account_type","gender","age_category")
+xlabs<-c("Bank Account Type","Gender","Age Categories")
+for(i in 1: length(vars)){
+  summ_function(vars[i],xlabs[i],xlabs[i])
+}
+
+```
+
+
+
