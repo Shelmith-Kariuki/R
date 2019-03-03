@@ -1,8 +1,11 @@
 ---
 title: <center><strong> "Data Fest Kampala (R Training)"</strong></center>
 author: <center><strong>"Shelmith Nyagathiri Kariuki"</strong></center>
-date: <center><strong>"March 2, 2019"</strong></center>
-output: html_document
+date: <center><strong>"March 7, 2019"</strong></center>
+output:
+  html_document:
+    toc_depth: '6'
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -33,7 +36,7 @@ pkgs <- c("dplyr","lubridate","tidyr","ggplot2","stringr","kableExtra")
 
 
 ## Check if there are variables you want to load, that are not already installed. 
-miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]] # vector of missing packages
+miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]] 
 
 ## Installing the missing packages
 if(length(miss_pkgs)>0){
@@ -100,11 +103,16 @@ for(i in 1: length(dsn_challenge_files)){
 rm(i)
 rm(dsn_challenge)
 rm(dsn_challenge_files)
+rm(testdemographics)
+rm(testperf)
+rm(testprevloans)
+rm(SampleSubmission)
 
 ```
 
 #### Handling duplicates
 <br>
+
 ```{r,warning=FALSE, message=FALSE,echo=TRUE}
 
 ## Check whether the traindemographic dataset has unique customer ids
@@ -149,6 +157,10 @@ traindemographics$birthdate <- ymd(traindemographics$birthdate)
   ### Generate age
 traindemographics$age<-as.numeric(ceiling(difftime(ymd(20180101),traindemographics$birthdate,"days")/365))
 
+## Remove unnecessary objects
+rm(gender)
+rm(i)
+rm(state)
 
 ```
 
@@ -220,12 +232,158 @@ print(summ_graph)
 ## Generate a vector containing tha variables whose summary statistics you want to obtain.
 
 vars<- c("bank_account_type","gender","age_category","state")
-xlabs<-c("Bank Account Type","Gender","Age Categories","State")
+xlabs<-c("Bank Account Type","Gender","Age Categories","States")
 for(i in 1: length(vars)){
   summ_function(vars[i],xlabs[i],xlabs[i])
+}
+
+##Remove unnecessary objects
+rm(summ_graph)
+rm(summ_table)
+rm(xlabs)
+rm(vars)
+
+```
+
+
+#### Append the trainprevloans dataset with the trainperf loans dataset
+
+```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
+## We want to keep the column names that are in both datasets
+
+vars <- names(trainprevloans)[which(names(trainprevloans) %in% names(trainperf))]
+vars
+
+## Subset the two datasets, to only contain the selected variables
+
+trainprevloans <- trainprevloans %>% 
+  select(vars)
+
+trainperf <- trainperf %>% 
+  select(vars)
+
+## Append the two datasets
+
+trainloans <- bind_rows(trainprevloans, trainperf)
+
+## Remove the datasets that we no longer need
+
+rm(trainprevloans)
+rm(trainperf)
+
+```
+
+#### Merge with the traindemographics dataset
+
+```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
+
+demo_loans_data <- right_join(traindemographics, trainloans, by="customerid")
+
+## Remove unwanted objects
+rm(traindemographics)
+rm(trainloans)
+
+```
+
+#### Determine the number of loans applied each year, each month, each day of the month, and each hour
+
+```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
+## We assume that the creation date represents the date when the loan was applied.
+
+## Convert the creation date to date time format
+
+demo_loans_data$creationdate<-substr(as.character(demo_loans_data$creationdate),1,19)
+demo_loans_data$creationdate<-ymd_hms(demo_loans_data$creationdate)
+
+## Generate time variables from the creation date
+
+demo_loans_data <- demo_loans_data %>% 
+  mutate(App_Year = factor(year(creationdate)),
+         App_Month = month(creationdate,label = T,abbr = T),
+         App_Day = day(creationdate),
+         App_DoW = wday(creationdate,label = T, abbr = T),
+         App_Hour = hour(creationdate))
+
+```
+
+
+#### Generate a function that will plot a time series graph for each time series variable
+
+```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
+
+time_function <- function(xvar, xlab,title){
+  
+
+summ_table <- demo_loans_data %>%
+  distinct(customerid, loannumber,.keep_all = T) %>% 
+  group_by_(xvar) %>% 
+  summarise(count = n())
+
+print(kable_styling(kable(summ_table,col.names = c(xlab,"Count"))))
+
+summ_graph <- ggplot(summ_table, aes_string(x=xvar, y="count", group=1, color=1))+
+  geom_line(stat = "identity",color = "brown") + 
+  kampala_theme+
+  labs(title = paste("Number of Loans Applied \n per \n",title),x=xlab,
+                   y="Count")
+print(summ_graph)
+
+}
+
+xvars<-c("App_Year","App_Day","App_DoW","App_Hour")
+xlabs<-c("Year","Day of Month","Day of Week","Hour")
+xtitles<-xlabs
+
+for(i in 1: length(xvars)){
+  time_function(xvars[i],xlabs[i], xtitles[i])
 }
 
 ```
 
 
+#### Generate a function that will plot a time series graph for each time series variable, grouped by type of bank account, and loan term 
 
+
+```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
+
+## Add the word "days" to the termdays variable
+demo_loans_data$termdays<- paste(demo_loans_data$termdays,"days")
+
+## Convert loanterm days to a factor variable
+demo_loans_data$termdays<- factor(demo_loans_data$termdays)
+
+
+
+time_function <- function(xvar,gvar,xlab, gvarlab, title){
+  
+
+summ_table <- demo_loans_data %>%
+  distinct(customerid, loannumber,.keep_all = T) %>% 
+  group_by_(xvar,gvar) %>% 
+  summarise(count = n())
+
+print(kable_styling(kable(summ_table,col.names = c(xlab,gvarlab,"Count"))))
+
+summ_graph <- ggplot(summ_table, aes_string(x=xvar, y="count", group=gvar, color=gvar))+
+  geom_line(stat = "identity") + 
+  kampala_theme+
+  scale_color_brewer(palette = "Spectral")+
+  labs(title = paste("Number of Loans Applied \n per \n",title),x=xlab,
+                   y="Count")
+print(summ_graph)
+
+}
+
+xvars<-c("App_Year","App_Day","App_DoW","App_Hour")
+gvars<-c("termdays")
+xlabs<-c("Year","Day of Month","Day of Week","Hour")
+gvarlabs<-c("Loan Term")
+xtitles<-xlabs
+
+for(i in 1: length(xvars)){
+  for(j in 1: length(gvars)){
+  time_function(xvars[i],gvars[j],xlabs[i],gvarlabs[j],xtitles[i])
+  }
+}
+
+```
