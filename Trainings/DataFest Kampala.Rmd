@@ -17,11 +17,16 @@ rm(list = ls())
 knitr::include_graphics("C:/Users/user/Documents/Github/R/Images/DFK Image.PNG")
 ```
 
-#### Introduction
+### Introduction
 
-Talk about Zindi here,and introduce the Data Science Nigeria challenge. 
+Zindi is the first data science competition platform in Africa. Zindi hosts an entire data science ecosystem of scientists, engineers, academics, companies, NGOs, governments and institutions focused on solving Africa's most pressing problems.
+The data used herein comes from the Data Science Nigeria Loan Prediction challenge,hosted on Zindi, whose details can be found here:
+ "http://zindi.africa/competitions/data-science-nigeria-challenge-1-loan-default-prediction"
 
-#### Load the libraries (packages) required
+**Disclaimer**: This script does not involve any machine learning. The data has been used to train part of the tidyverse package. 
+
+
+### Load the libraries (packages) required
 
 <br>
 ```{r,echo=TRUE, warning=FALSE,message=FALSE,include=TRUE}
@@ -52,7 +57,7 @@ rm(pkgs)
 rm(vars)
 ```
 
-#### Setting the plot theme
+### Setting the plot theme
 <br>
 ```{r,warning=FALSE, message=FALSE,echo=TRUE}
 kampala_theme<-  theme(legend.position = "right", 
@@ -68,7 +73,7 @@ kampala_theme<-  theme(legend.position = "right",
 
 ```
 
-#### Read in the datasets
+### Read in the datasets
 <br>
 ```{r,warning=FALSE, message=FALSE,echo=TRUE}
 
@@ -110,7 +115,7 @@ rm(SampleSubmission)
 
 ```
 
-#### Handling duplicates
+### Handling duplicates
 <br>
 
 ```{r,warning=FALSE, message=FALSE,echo=TRUE}
@@ -128,7 +133,7 @@ traindemographics <- traindemographics %>%
   unique()
 ```
 
-#### Generating more demographic variables
+### Generating more demographic variables
 <br>
 ```{r,warning=FALSE, message=FALSE,echo=TRUE}
 
@@ -164,7 +169,7 @@ rm(state)
 
 ```
 
-#### Generating new variables, based on conditions of another variable
+### Generating new variables, based on conditions of another variable
 <br>
 ```{r,warning=FALSE, message=FALSE,echo=TRUE}
 
@@ -176,7 +181,7 @@ traindemographics <- traindemographics %>%
 table(traindemographics$age_category)
 ```
 
-#### Generating summary statistics for one categorical variables
+### Generating summary statistics for one categorical variables
 <br>
 ```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
 ## Age
@@ -201,7 +206,7 @@ summ_graph <- ggplot(summ_table, aes(x=age_category,y=perc))+
 summ_graph
 ```
 
-#### Generating summary statistics for several categorical variables
+### Generating summary statistics for several categorical variables
 
 ```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
 
@@ -246,7 +251,7 @@ rm(vars)
 ```
 
 
-#### Append the trainprevloans dataset with the trainperf loans dataset
+### Append the trainprevloans dataset with the trainperf loans dataset
 
 ```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
 ## We want to keep the column names that are in both datasets
@@ -273,7 +278,7 @@ rm(trainperf)
 
 ```
 
-#### Merge with the traindemographics dataset
+### Merge with the traindemographics dataset
 
 ```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
 
@@ -285,7 +290,7 @@ rm(trainloans)
 
 ```
 
-#### Determine the number of loans applied each year, each month, each day of the month, and each hour
+### Determine the number of loans applied each year, each month, each day of the month, and each hour
 
 ```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
 ## We assume that the creation date represents the date when the loan was applied.
@@ -307,7 +312,7 @@ demo_loans_data <- demo_loans_data %>%
 ```
 
 
-#### Generate a function that will plot a time series graph for each time series variable, showing the frequency of loans applied.
+### Generate a time series graph that shows the number of loans applied.
 
 ```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
 
@@ -341,7 +346,7 @@ for(i in 1: length(xvars)){
 ```
 
 
-#### Generate a time series graph that shows the number of loans applied, per loan term. 
+### Generate a time series graph that shows the number of loans applied, per loan term. 
 
 
 ```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
