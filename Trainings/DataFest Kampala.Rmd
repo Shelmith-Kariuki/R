@@ -52,7 +52,7 @@ rm(pkgs)
 rm(vars)
 ```
 
-#### Setting my plot theme
+#### Setting the plot theme
 <br>
 ```{r,warning=FALSE, message=FALSE,echo=TRUE}
 kampala_theme<-  theme(legend.position = "right", 
@@ -307,7 +307,7 @@ demo_loans_data <- demo_loans_data %>%
 ```
 
 
-#### Generate a function that will plot a time series graph for each time series variable
+#### Generate a function that will plot a time series graph for each time series variable, showing the frequency of loans applied.
 
 ```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
 
@@ -341,7 +341,7 @@ for(i in 1: length(xvars)){
 ```
 
 
-#### Generate a function that will plot a time series graph for each time series variable, grouped by type of bank account, and loan term 
+#### Generate a time series graph that shows the number of loans applied, per loan term. 
 
 
 ```{r,warning=FALSE, message=FALSE,echo=TRUE,results='asis'}
