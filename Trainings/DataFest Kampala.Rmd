@@ -14,7 +14,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, echo=FALSE, fig.cap="", out.width = '100%'}
 rm(list = ls())
-knitr::include_graphics("C:/Users/user/Documents/Github/R/Images/DFK Image.PNG")
+
+## Create an object containing the path, where the intro image is saved.
+### The image is stored on my github profile, R repository
+### Please change the path to suit the location of the image, once you download it.
+
+image_path = "C:/Users/user/Documents/Github/R/Images"
+knitr::include_graphics(paste(image_path,"DFK Image.PNG",sep="/"))
 ```
 
 ### Introduction
@@ -77,11 +83,16 @@ kampala_theme<-  theme(legend.position = "right",
 <br>
 ```{r,warning=FALSE, message=FALSE,echo=TRUE}
 
-# df <- read.csv("C:/Users/user/Documents/Github/R/Datasets/DSN Zindi LoanDataset/traindemographics.csv")
+## Create an object containing the path, where the data is saved
+
+### Please change the path to suit the location of your datasets
+data_path <- "C:/Users/user/Documents/Github/R/Datasets/DSN Zindi LoanDataset"
+
+df <- read.csv(paste(data_path, "traindemographics.csv",sep="/"))
 
 ## List the files that are in that directory
 
-dsn_challenge_files <-list.files("C:/Users/user/Documents/Github/R/Datasets/DSN Zindi LoanDataset",pattern = ".csv")
+dsn_challenge_files <-list.files(data_path, pattern = ".csv")
 dsn_challenge_files
 
 ## Generate an empty list that will hold the datasets
@@ -93,7 +104,7 @@ dsn_challenge <- list()
 for(i in 1: length(dsn_challenge_files)){
   
   ## Read in each dataset, one by one
-  dsn_challenge[[i]]<-read.csv(paste("C:/Users/user/Documents/Github/R/Datasets/DSN Zindi LoanDataset/", dsn_challenge_files[i],sep = ""))
+  dsn_challenge[[i]]<-read.csv(paste(data_path, dsn_challenge_files[i],sep = "/"))
   
   ## Remove the ".csv" from the name
   dsn_challenge_files[i] <- gsub(".csv","",dsn_challenge_files[i])

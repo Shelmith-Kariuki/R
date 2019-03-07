@@ -265,11 +265,16 @@ rm(vars)</code></pre>
 <div id="read-in-the-datasets" class="section level3">
 <h3>Read in the datasets</h3>
 <p><br></p>
-<pre class="r"><code># df &lt;- read.csv(&quot;C:/Users/user/Documents/Github/R/Datasets/DSN Zindi LoanDataset/traindemographics.csv&quot;)
+<pre class="r"><code>## Create an object containing the path, where the data is saved
+
+### Please change the path to suit the location of your datasets
+data_path &lt;- &quot;C:/Users/user/Documents/Github/R/Datasets/DSN Zindi LoanDataset&quot;
+
+df &lt;- read.csv(paste(data_path, &quot;traindemographics.csv&quot;,sep=&quot;/&quot;))
 
 ## List the files that are in that directory
 
-dsn_challenge_files &lt;-list.files(&quot;C:/Users/user/Documents/Github/R/Datasets/DSN Zindi LoanDataset&quot;,pattern = &quot;.csv&quot;)
+dsn_challenge_files &lt;-list.files(data_path, pattern = &quot;.csv&quot;)
 dsn_challenge_files</code></pre>
 <pre><code>## [1] &quot;SampleSubmission.csv&quot;  &quot;testdemographics.csv&quot;  &quot;testperf.csv&quot;         
 ## [4] &quot;testprevloans.csv&quot;     &quot;traindemographics.csv&quot; &quot;trainperf.csv&quot;        
@@ -283,7 +288,7 @@ dsn_challenge &lt;- list()
 for(i in 1: length(dsn_challenge_files)){
   
   ## Read in each dataset, one by one
-  dsn_challenge[[i]]&lt;-read.csv(paste(&quot;C:/Users/user/Documents/Github/R/Datasets/DSN Zindi LoanDataset/&quot;, dsn_challenge_files[i],sep = &quot;&quot;))
+  dsn_challenge[[i]]&lt;-read.csv(paste(data_path, dsn_challenge_files[i],sep = &quot;/&quot;))
   
   ## Remove the &quot;.csv&quot; from the name
   dsn_challenge_files[i] &lt;- gsub(&quot;.csv&quot;,&quot;&quot;,dsn_challenge_files[i])
