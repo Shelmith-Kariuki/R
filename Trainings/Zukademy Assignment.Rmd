@@ -1,0 +1,227 @@
+---
+title: <center><strong>"Zukademy Assignment"</strong></center>
+date: <center>"April 19, 2019"</center>
+output: html_document
+---
+
+```{r setup, include=FALSE}
+name<-"insert your name here"
+```
+
+This markdown was produced by `r name` on `r Sys.Date()`
+
+<center><h2>Introduction</h2></center>
+
+These assignment covers all the tidyverse based topics covered so far. 
+
+The data used in Q1-Q10 can be found here <https://zindi.africa/competitions/mobile-money-and-financial-inclusion-in-tanzania-challenge/data>
+
+Download the **training.csv** dataset, and the **Variable_Codebook.docx** document.
+
+### 1. Read in the dataset
+<br>
+```{r}
+## write code here
+```
+
+### 2. Skim through the assignment, and load the libraries that you will require.
+
+<br>
+```{r}
+## write code here
+```
+
+### 3. Recode all the variables that need to be recoded, based on Variable_Codebook document
+
+<br>
+
+```{r}
+## write code here
+### Hint: instead of gender reading 1, 2, the values should read Male, Female. Remember ifelse(condition, result if condition is True, result if condition is false)
+
+### Q2: Gender
+
+### Q3: Marital Status
+
+### Q4: Highest level of education
+
+### ...
+
+### Mobile_money_classification
+
+
+
+### These chunk will be long. Apologies in advance, but practice practice makes perfect
+
+```
+
+###4. Generate frequency tables and graphs, for all the categorical variables
+
+####4.1 Gender
+
+<br>
+```{r}
+## write code here
+```
+
+####4.2 Marital Status
+
+<br>
+
+```{r}
+## write code here
+```
+
+####4.3 Highest level of education
+
+<br>
+```{r}
+## write code here
+```
+
+#### And so on... Each chunk should have results (table and graph) for one variable.
+
+<br>
+```{r}
+## write code here
+```
+
+###5 Which gender:
+
+#### 5.1 Saves the most?
+<br>
+```{r}
+## write code here
+```
+
+#### 5.2 Borrows the most?
+<br>
+```{r}
+## write code here
+```
+
+#### 5.3 Uses insurance the most?
+<br>
+```{r}
+## write code here
+```
+
+
+###6. Between those who save, and those who do not, which group has a higher literacy level? (both english and kiswahili)
+<br>
+```{r}
+## write code here
+```
+
+###7. How many single females, aged 50 and below, have insurance and use mobile money only? How many of them received cash in the past 30 days
+<br>
+```{r}
+## write code here
+```
+
+###8. What is the mean age of:
+
+####8.1 Borrowers vs Non Borrowers
+<br>
+```{r}
+## write code here
+```
+
+####8.2 Those who save, vs those who do not
+<br>
+```{r}
+## write code here
+```
+
+####8.3 Those who can read only vs those who can write only, in english 
+
+<br>
+```{r}
+## write code here
+```
+
+###9. How many married respondents, with no formal education, work for the government?
+<br>
+```{r}
+## write code here
+```
+
+
+###10. Think of any other analysis that can be done using these data and add it here.
+
+<br>
+```{r}
+## write code here
+```
+
+
+
+###11. The data generated below shows the quarterly perfomance of students, in zukademy
+
+<br>
+```{r}
+## write code here
+cols<-c("2011Q1","2011Q2","2011Q3","2011Q4",
+     "2012Q1","2012Q2","2012Q3","2012Q4",
+     "2013Q1","2013Q2","2013Q3","2013Q4",
+     "2014Q1","2014Q2","2014Q3","2014Q4",
+     "2015Q1","2015Q2","2015Q3","2015Q4")
+
+rows<-c("Males","Females")
+
+data<-data.frame(matrix(sample(100:500,length(cols)*length(rows),replace = F),ncol=length(cols), nrow = length(rows), byrow = T))
+
+colnames(data) = cols
+rownames(data)=rows
+
+```
+
+
+#### 11.1 Reshape the data, so that you get a dataset with three columns,Gender, Year, Quarter and Marks
+<br>
+```{r}
+## write code here
+```
+
+
+#### 11.2 Calculate the average marks per gender, .per year
+<br>
+```{r}
+## write code here
+```
+
+#### 11.3 Represent the results in 11.2 on a line graph
+<br>
+```{r}
+## write code here
+```
+
+#### 11.4 Calculate the average marks per gender, per year and per quarter
+<br>
+```{r}
+## write code here
+```
+
+#### 11.5 Calculate the total marks,for both genders, per quarter and per year
+<br>
+```{r}
+## write code here
+```
+
+
+#### 11.6 Represent the results in 11.5 on a line graph.
+<br>
+```{r}
+## write code here
+```
+
+#### 11.7 All those who score 300 and above, are taken for dinner at Kempinski. How many ladies got their Kempinski treat in 2013 and 2014?
+<br>
+```{r}
+## write code here
+```
+
+
+
+
+
