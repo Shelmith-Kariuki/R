@@ -1,0 +1,501 @@
+,Sid,Gender,Age,Department,Role,Income,Marital_Status,County,Leave_Days,Promotion
+0,10715,Male,31,Finance,Mid,5991,Single,Kisumu,11,No
+1,17041,Male,48,Research Analyst,Junior,3387,Divorced,Wajir,8,Yes
+2,16232,Male,35,Operations,Junior,3170,Married,Mombasa,0,No
+3,19576,Female,41,Finance,Senior,5557,Married,Nyeri,8,No
+4,13463,Female,43,Associate,Junior,1651,Married,Nairobi,2,Yes
+5,19788,Female,30,Finance,Junior,6859,Single,Taita,9,Yes
+6,10784,Male,45,Data,Mid,5340,Single,Nairobi,12,Yes
+7,13847,Male,19,Research Analyst,Mid,5123,Divorced,Taita,12,No
+8,18265,Male,44,Operations,Senior,8161,Divorced,Kiambu,13,Yes
+9,10586,Male,34,Data,Mid,5774,Married,Kisumu,4,No
+10,13936,Male,21,Research Analyst,Senior,7076,Divorced,Nyeri,18,Yes
+11,16819,Male,37,Research Analyst,Mid,9897,Single,Kirinyaga,20,Yes
+12,13700,Male,44,Finance,Mid,8595,Divorced,Embu,3,Yes
+13,15156,Male,37,Data,Junior,3604,Divorced,Kiambu,4,No
+14,16384,Female,32,Operations,Mid,9463,Single,Kiambu,12,No
+15,12463,Male,19,Associate,Junior,2519,Single,Embu,23,No
+16,15643,Male,20,Operations,Senior,1217,Married,Taita,12,Yes
+17,10415,Female,35,Associate,Junior,3604,Single,Embu,4,No
+18,19994,Male,47,Operations,Senior,9463,Single,Nairobi,11,Yes
+19,10665,Male,18,Associate,Junior,8161,Married,Kisumu,6,No
+20,18197,Female,26,Data,Senior,1868,Married,Laikipia,11,No
+21,13823,Male,31,Data,Mid,8378,Divorced,Wajir,10,Yes
+22,10192,Male,24,Associate,Senior,9463,Single,Mombasa,22,Yes
+23,18383,Male,35,Research Analyst,Senior,5340,Married,Laikipia,17,No
+24,17262,Female,35,Research Analyst,Junior,2302,Married,Wajir,22,Yes
+25,19304,Male,25,Data,Junior,1000,Divorced,Kiambu,18,No
+26,11251,Female,46,Data,Mid,5340,Single,Kisumu,15,Yes
+27,18438,Male,22,Finance,Junior,6425,Married,Nairobi,9,Yes
+28,17050,Male,27,Operations,Junior,8161,Married,Wajir,6,No
+29,15450,Male,49,Finance,Junior,6859,Married,Nyeri,21,Yes
+30,13835,Male,22,Operations,Mid,2302,Divorced,Mombasa,23,Yes
+31,17590,Female,29,Data,Mid,4906,Single,Taita,8,No
+32,16301,Male,35,Associate,Junior,4689,Married,Wajir,16,Yes
+33,18997,Female,32,Associate,Senior,5340,Single,Nyeri,14,No
+34,10370,Male,42,Data,Senior,9680,Single,Kisumu,16,No
+35,10501,Female,30,Operations,Junior,3170,Divorced,Wajir,7,Yes
+36,15961,Female,25,Data,Senior,3604,Divorced,Wajir,7,Yes
+37,13683,Female,36,Operations,Senior,7076,Single,Lamu,7,No
+38,16499,Male,29,Associate,Junior,3821,Single,Wajir,18,No
+39,18257,Male,22,Associate,Mid,1868,Single,Kirinyaga,18,Yes
+40,16960,Male,36,Associate,Mid,2519,Divorced,Nairobi,23,No
+41,19591,Male,21,Finance,Junior,5123,Married,Nyeri,23,Yes
+42,14241,Male,41,Research Analyst,Junior,8812,Divorced,Lamu,9,No
+43,15292,Female,22,Finance,Senior,7510,Married,Mombasa,5,No
+44,13770,Male,26,Operations,Junior,7293,Single,Kisumu,5,No
+45,11992,Male,21,Finance,Mid,2519,Divorced,Nairobi,22,No
+46,12449,Female,43,Operations,Junior,5123,Single,Kirinyaga,15,Yes
+47,15819,Male,28,Operations,Mid,7076,Single,Lamu,1,No
+48,18772,Female,34,Research Analyst,Senior,7944,Married,Laikipia,16,Yes
+49,19313,Male,38,Operations,Mid,9029,Single,Mombasa,19,Yes
+50,19549,Male,32,Data,Mid,5557,Divorced,Embu,20,No
+51,10248,Male,23,Operations,Junior,9463,Single,Kisumu,21,No
+52,13017,Male,20,Research Analyst,Mid,9680,Single,Mombasa,23,Yes
+53,19538,Male,43,Research Analyst,Junior,5557,Single,Nyeri,10,Yes
+54,17991,Male,45,Data,Mid,9463,Single,Laikipia,5,No
+55,15876,Female,20,Data,Junior,1434,Divorced,Laikipia,17,Yes
+56,16092,Male,36,Associate,Junior,7293,Divorced,Wajir,6,Yes
+57,19981,Female,32,Research Analyst,Junior,1651,Married,Lamu,0,No
+58,13925,Female,20,Data,Senior,3387,Married,Nairobi,24,Yes
+59,15719,Male,49,Data,Mid,5774,Divorced,Nyeri,15,No
+60,13963,Female,47,Research Analyst,Junior,3170,Single,Embu,5,Yes
+61,16541,Male,48,Operations,Mid,8161,Divorced,Kiambu,13,Yes
+62,12907,Male,33,Data,Junior,9029,Married,Nyeri,21,Yes
+63,15883,Female,18,Operations,Senior,6642,Divorced,Mombasa,7,Yes
+64,12611,Male,48,Data,Mid,4472,Divorced,Lamu,13,Yes
+65,13946,Female,28,Operations,Senior,5991,Married,Mombasa,8,No
+66,19891,Female,48,Operations,Senior,9029,Married,Nyeri,14,No
+67,17528,Male,41,Operations,Junior,7076,Divorced,Laikipia,1,Yes
+68,12347,Female,46,Associate,Junior,4038,Divorced,Mombasa,0,No
+69,15794,Female,33,Finance,Senior,8812,Divorced,Taita,1,No
+70,17696,Female,28,Data,Junior,6208,Single,Nairobi,20,Yes
+71,11450,Female,24,Research Analyst,Mid,7510,Single,Nyeri,13,No
+72,17830,Male,33,Finance,Senior,6425,Single,Taita,1,No
+73,19619,Male,33,Research Analyst,Junior,7293,Single,Taita,16,No
+74,16983,Female,41,Research Analyst,Senior,3170,Married,Nairobi,2,No
+75,12598,Male,42,Data,Senior,8161,Divorced,Laikipia,10,No
+76,12729,Female,31,Finance,Junior,8595,Single,Laikipia,10,Yes
+77,17660,Male,28,Research Analyst,Senior,7293,Divorced,Embu,10,No
+78,18165,Male,22,Research Analyst,Senior,1217,Divorced,Kisumu,11,No
+79,19789,Male,29,Research Analyst,Mid,2736,Married,Mombasa,1,Yes
+80,19151,Male,18,Finance,Senior,5774,Married,Mombasa,10,Yes
+81,12576,Female,32,Data,Mid,7076,Single,Laikipia,19,No
+82,13869,Female,29,Finance,Junior,3387,Divorced,Nyeri,22,No
+83,14291,Female,20,Data,Mid,5340,Married,Mombasa,14,No
+84,10156,Male,21,Finance,Senior,9246,Divorced,Nyeri,21,No
+85,10397,Male,32,Associate,Mid,7076,Single,Wajir,15,No
+86,13734,Female,30,Operations,Senior,4255,Divorced,Kisumu,7,Yes
+87,14210,Male,25,Data,Mid,1434,Single,Nyeri,17,Yes
+88,17313,Female,50,Associate,Mid,3387,Divorced,Lamu,7,No
+89,12241,Female,39,Research Analyst,Senior,5123,Married,Embu,2,Yes
+90,16799,Male,41,Research Analyst,Mid,7944,Single,Kisumu,18,No
+91,10425,Female,38,Research Analyst,Junior,9680,Single,Laikipia,6,Yes
+92,14484,Female,33,Finance,Mid,7293,Married,Nairobi,0,No
+93,16921,Female,22,Associate,Senior,6859,Single,Kiambu,1,No
+94,17648,Female,18,Operations,Mid,1217,Divorced,Embu,7,Yes
+95,13211,Female,48,Associate,Senior,5774,Single,Kisumu,13,No
+96,15880,Female,30,Associate,Mid,8595,Single,Wajir,21,Yes
+97,17690,Female,26,Research Analyst,Senior,4255,Single,Kiambu,2,No
+98,19291,Female,44,Associate,Senior,5557,Married,Nyeri,9,Yes
+99,11212,Male,28,Finance,Junior,2085,Married,Kiambu,3,Yes
+100,14166,Male,36,Operations,Senior,1868,Single,Taita,4,No
+101,14414,Male,50,Finance,Senior,6208,Single,Kisumu,18,Yes
+102,10798,Male,27,Research Analyst,Mid,9680,Single,Nyeri,16,No
+103,14486,Female,37,Finance,Junior,4038,Married,Nairobi,23,No
+104,12202,Female,23,Operations,Senior,7727,Single,Lamu,12,No
+105,15087,Female,42,Research Analyst,Junior,5774,Divorced,Kiambu,17,No
+106,15860,Female,45,Associate,Senior,9680,Married,Embu,24,Yes
+107,13990,Male,20,Finance,Junior,4472,Married,Kirinyaga,22,Yes
+108,10861,Female,47,Finance,Senior,4906,Married,Kiambu,11,No
+109,12878,Female,33,Research Analyst,Mid,1217,Married,Kiambu,9,Yes
+110,15233,Male,34,Data,Senior,1217,Married,Nairobi,19,No
+111,15992,Male,35,Associate,Junior,5774,Single,Taita,4,No
+112,19587,Female,41,Data,Senior,1434,Divorced,Embu,5,No
+113,10431,Male,43,Associate,Senior,2302,Divorced,Kiambu,1,Yes
+114,18073,Male,24,Finance,Mid,1868,Divorced,Kirinyaga,8,No
+115,18474,Male,48,Associate,Mid,2085,Single,Taita,8,No
+116,16233,Female,50,Operations,Junior,2953,Single,Kirinyaga,9,Yes
+117,18622,Male,25,Research Analyst,Mid,7293,Divorced,Lamu,3,No
+118,12216,Male,37,Associate,Junior,2519,Married,Lamu,7,Yes
+119,17725,Female,27,Data,Junior,7944,Divorced,Nairobi,22,Yes
+120,14324,Male,34,Operations,Mid,8812,Married,Mombasa,17,No
+121,17204,Male,19,Data,Junior,4255,Married,Kirinyaga,7,No
+122,17339,Male,44,Data,Mid,4689,Single,Kiambu,10,Yes
+123,17207,Female,25,Associate,Mid,5123,Married,Wajir,12,No
+124,17099,Female,43,Associate,Junior,5774,Single,Embu,4,Yes
+125,11505,Female,18,Data,Junior,4906,Divorced,Mombasa,7,Yes
+126,10227,Male,21,Research Analyst,Senior,1217,Single,Lamu,9,Yes
+127,13044,Female,50,Research Analyst,Mid,9029,Married,Embu,9,No
+128,10487,Female,30,Data,Mid,4255,Single,Nairobi,16,No
+129,13962,Female,50,Finance,Mid,8812,Divorced,Kisumu,15,Yes
+130,19906,Male,28,Research Analyst,Mid,8812,Divorced,Kiambu,20,No
+131,15481,Male,32,Data,Junior,1217,Divorced,Kiambu,24,Yes
+132,12036,Male,39,Research Analyst,Junior,1000,Single,Mombasa,22,Yes
+133,11464,Female,25,Operations,Junior,8161,Divorced,Mombasa,6,No
+134,16236,Male,30,Research Analyst,Senior,3604,Married,Kiambu,21,No
+135,17524,Female,49,Research Analyst,Mid,1868,Married,Laikipia,6,Yes
+136,17042,Female,37,Data,Junior,4689,Married,Kisumu,1,Yes
+137,16017,Male,36,Data,Junior,8161,Single,Lamu,5,No
+138,19243,Female,32,Data,Senior,8161,Single,Nyeri,11,No
+139,14535,Male,29,Associate,Junior,3170,Divorced,Wajir,4,No
+140,12261,Female,22,Finance,Senior,1651,Married,Mombasa,3,No
+141,14838,Female,20,Finance,Junior,5774,Married,Nyeri,5,Yes
+142,19558,Female,40,Research Analyst,Senior,7293,Single,Nyeri,16,No
+143,18113,Female,44,Data,Senior,7944,Married,Lamu,8,Yes
+144,17978,Male,33,Operations,Senior,4038,Single,Lamu,23,Yes
+145,10466,Male,22,Research Analyst,Senior,9246,Divorced,Kisumu,21,Yes
+146,17999,Female,21,Data,Senior,6208,Married,Wajir,16,Yes
+147,17603,Female,41,Data,Senior,6859,Married,Wajir,22,Yes
+148,15324,Female,28,Research Analyst,Mid,1000,Divorced,Kiambu,7,Yes
+149,16725,Female,23,Associate,Senior,2953,Single,Lamu,6,Yes
+150,16712,Male,50,Associate,Senior,4472,Married,Nairobi,20,Yes
+151,13236,Male,36,Associate,Mid,2302,Divorced,Taita,20,No
+152,12709,Male,26,Finance,Mid,7293,Divorced,Lamu,22,No
+153,12787,Female,44,Operations,Mid,6425,Married,Kisumu,6,Yes
+154,11927,Male,28,Finance,Junior,1651,Single,Nyeri,1,No
+155,18766,Male,35,Associate,Senior,3387,Married,Wajir,0,No
+156,18681,Male,46,Associate,Mid,9246,Divorced,Kirinyaga,22,Yes
+157,17905,Female,22,Data,Senior,5340,Married,Mombasa,4,No
+158,18167,Male,40,Operations,Junior,8812,Married,Kirinyaga,16,No
+159,10087,Male,34,Research Analyst,Mid,2519,Married,Embu,13,No
+160,11057,Male,40,Operations,Junior,8378,Single,Kiambu,15,No
+161,19240,Male,47,Associate,Junior,7944,Single,Kisumu,18,Yes
+162,13697,Female,34,Operations,Junior,1217,Married,Nyeri,2,No
+163,14725,Female,31,Finance,Junior,6642,Married,Mombasa,24,Yes
+164,18408,Male,49,Finance,Junior,2519,Single,Embu,0,Yes
+165,15448,Female,33,Associate,Junior,6642,Married,Laikipia,18,No
+166,18231,Male,31,Operations,Senior,4472,Married,Embu,1,Yes
+167,16246,Male,32,Research Analyst,Senior,1000,Single,Kiambu,12,Yes
+168,12962,Male,22,Research Analyst,Junior,8161,Married,Nyeri,19,Yes
+169,12322,Female,49,Associate,Mid,4906,Divorced,Kisumu,14,Yes
+170,18318,Female,47,Operations,Senior,7944,Married,Lamu,19,Yes
+171,15109,Male,18,Finance,Mid,1434,Single,Taita,7,Yes
+172,10317,Male,32,Finance,Mid,8595,Single,Lamu,12,No
+173,19683,Female,26,Finance,Mid,4689,Married,Laikipia,5,No
+174,18445,Female,33,Data,Junior,9246,Divorced,Taita,13,Yes
+175,10805,Male,29,Finance,Junior,3387,Single,Kiambu,13,Yes
+176,11034,Female,37,Operations,Junior,1217,Divorced,Embu,17,Yes
+177,15345,Male,23,Operations,Mid,1868,Married,Embu,2,No
+178,18482,Male,31,Associate,Mid,8595,Married,Laikipia,18,Yes
+179,13060,Female,18,Operations,Junior,1868,Divorced,Lamu,2,No
+180,12154,Male,19,Research Analyst,Mid,2953,Single,Wajir,8,No
+181,13173,Female,30,Data,Junior,7944,Single,Laikipia,12,No
+182,16371,Female,20,Research Analyst,Junior,5340,Married,Kirinyaga,6,Yes
+183,18887,Male,36,Associate,Mid,7944,Divorced,Mombasa,6,No
+184,18663,Male,43,Research Analyst,Senior,4689,Single,Laikipia,6,No
+185,10082,Male,34,Finance,Senior,4906,Single,Kisumu,15,No
+186,14092,Male,41,Finance,Senior,9029,Single,Lamu,16,Yes
+187,16080,Male,35,Data,Mid,2519,Divorced,Wajir,2,No
+188,14678,Female,50,Research Analyst,Mid,7944,Married,Kisumu,14,Yes
+189,18275,Female,30,Operations,Mid,3821,Married,Kiambu,11,Yes
+190,18828,Male,27,Research Analyst,Senior,8161,Single,Embu,3,No
+191,17940,Male,18,Associate,Junior,2519,Single,Taita,17,No
+192,13603,Female,37,Associate,Senior,1868,Married,Taita,4,No
+193,10562,Female,27,Finance,Junior,2736,Divorced,Nyeri,7,Yes
+194,10797,Female,36,Finance,Junior,5123,Single,Taita,1,No
+195,19479,Female,22,Operations,Senior,3821,Divorced,Nyeri,7,Yes
+196,18131,Male,26,Associate,Junior,1000,Married,Lamu,11,Yes
+197,14451,Female,38,Research Analyst,Mid,3604,Divorced,Kisumu,5,No
+198,12438,Male,32,Research Analyst,Junior,9029,Divorced,Nyeri,23,No
+199,11585,Male,31,Finance,Mid,6425,Single,Taita,7,No
+200,14463,Female,22,Operations,Mid,5340,Divorced,Wajir,9,Yes
+201,13580,Male,35,Finance,Mid,9463,Divorced,Wajir,16,Yes
+202,18877,Male,44,Research Analyst,Junior,5991,Single,Nairobi,1,No
+203,16817,Male,43,Data,Senior,5557,Divorced,Kiambu,4,Yes
+204,10268,Male,18,Research Analyst,Senior,7293,Divorced,Embu,24,Yes
+205,18604,Male,45,Operations,Junior,5123,Divorced,Wajir,15,Yes
+206,10845,Male,33,Data,Mid,6208,Divorced,Nairobi,22,No
+207,10652,Male,23,Finance,Mid,9246,Married,Kirinyaga,24,No
+208,17433,Male,29,Data,Senior,1868,Married,Nairobi,20,Yes
+209,12070,Female,44,Operations,Senior,3387,Single,Taita,10,Yes
+210,14225,Female,46,Research Analyst,Junior,6642,Single,Wajir,8,No
+211,14772,Male,28,Finance,Senior,1000,Single,Embu,0,No
+212,14061,Male,24,Finance,Senior,6425,Single,Kiambu,9,Yes
+213,14342,Male,25,Associate,Mid,1434,Married,Nairobi,10,Yes
+214,13648,Female,32,Operations,Mid,9680,Divorced,Laikipia,2,No
+215,11045,Male,24,Finance,Senior,9680,Married,Kiambu,2,No
+216,18660,Female,33,Research Analyst,Mid,4038,Married,Wajir,23,No
+217,16170,Female,19,Finance,Junior,2302,Single,Embu,16,No
+218,10505,Male,50,Finance,Senior,3170,Single,Laikipia,22,No
+219,15359,Female,20,Operations,Junior,5991,Divorced,Lamu,5,No
+220,15603,Male,37,Associate,Mid,6425,Married,Kisumu,0,No
+221,12891,Female,50,Research Analyst,Junior,9029,Married,Mombasa,6,No
+222,16686,Male,21,Data,Mid,4038,Married,Embu,11,Yes
+223,17704,Male,33,Finance,Junior,7727,Married,Nairobi,20,Yes
+224,17860,Male,31,Data,Senior,4038,Divorced,Mombasa,21,No
+225,16880,Male,34,Operations,Senior,8378,Divorced,Taita,1,Yes
+226,14877,Female,47,Finance,Senior,8595,Single,Nyeri,3,No
+227,14519,Female,50,Finance,Senior,7510,Divorced,Kiambu,0,Yes
+228,17045,Male,49,Data,Junior,9246,Divorced,Nairobi,22,Yes
+229,17813,Male,41,Finance,Mid,6642,Divorced,Wajir,17,No
+230,18212,Male,50,Research Analyst,Mid,6208,Single,Nairobi,1,No
+231,14312,Male,26,Finance,Mid,7076,Single,Taita,19,Yes
+232,11995,Female,47,Associate,Senior,5123,Divorced,Laikipia,11,Yes
+233,12766,Female,41,Data,Senior,7076,Single,Wajir,18,No
+234,10091,Female,47,Research Analyst,Junior,1217,Divorced,Kirinyaga,9,Yes
+235,11301,Male,22,Associate,Senior,3604,Married,Embu,2,No
+236,11559,Female,42,Associate,Mid,2953,Divorced,Embu,3,No
+237,18610,Female,49,Data,Junior,3604,Single,Wajir,14,No
+238,15290,Male,35,Data,Mid,4255,Single,Kirinyaga,15,No
+239,12683,Male,24,Operations,Senior,9246,Divorced,Laikipia,15,Yes
+240,11463,Male,29,Associate,Junior,2736,Divorced,Taita,8,No
+241,15001,Female,29,Operations,Senior,1217,Divorced,Mombasa,20,Yes
+242,17448,Male,44,Research Analyst,Senior,2953,Single,Kiambu,24,No
+243,14465,Male,34,Associate,Mid,1868,Divorced,Kirinyaga,15,Yes
+244,14888,Female,24,Research Analyst,Mid,8595,Married,Embu,7,No
+245,10215,Female,34,Research Analyst,Mid,2953,Married,Nyeri,3,No
+246,14801,Male,39,Operations,Junior,9463,Divorced,Kirinyaga,0,Yes
+247,15191,Male,35,Research Analyst,Mid,5557,Single,Mombasa,20,No
+248,19774,Male,38,Operations,Mid,9463,Single,Wajir,1,Yes
+249,12544,Female,22,Data,Senior,3170,Divorced,Kiambu,16,Yes
+250,12099,Male,28,Finance,Mid,4255,Single,Taita,3,No
+251,11195,Female,39,Data,Junior,7727,Married,Taita,20,No
+252,16423,Male,43,Associate,Senior,9680,Married,Wajir,18,No
+253,10310,Female,23,Data,Mid,9897,Married,Laikipia,15,Yes
+254,18036,Male,47,Operations,Mid,9680,Single,Embu,5,Yes
+255,19641,Male,26,Operations,Senior,7293,Divorced,Kiambu,21,No
+256,19104,Male,50,Research Analyst,Junior,2953,Single,Mombasa,6,No
+257,12854,Female,30,Data,Junior,2519,Divorced,Nairobi,22,Yes
+258,15268,Female,38,Research Analyst,Junior,4472,Divorced,Taita,7,Yes
+259,10126,Male,19,Operations,Senior,3170,Single,Taita,18,Yes
+260,18871,Male,23,Finance,Senior,9463,Divorced,Nyeri,13,Yes
+261,11091,Male,35,Finance,Junior,9463,Married,Nairobi,6,No
+262,11831,Male,20,Research Analyst,Senior,6425,Married,Kiambu,0,No
+263,15415,Female,27,Operations,Mid,7293,Married,Mombasa,15,Yes
+264,13104,Female,30,Associate,Senior,5774,Single,Taita,8,No
+265,13541,Female,36,Data,Junior,1651,Divorced,Taita,18,No
+266,12294,Male,39,Research Analyst,Senior,5991,Single,Nairobi,21,No
+267,18685,Male,31,Data,Mid,1868,Married,Lamu,15,No
+268,11436,Male,39,Associate,Mid,4472,Married,Taita,1,No
+269,18473,Male,26,Associate,Mid,2736,Divorced,Laikipia,22,No
+270,15240,Male,21,Finance,Senior,7510,Single,Wajir,5,No
+271,11405,Male,35,Finance,Junior,4906,Married,Nyeri,12,No
+272,14969,Male,39,Finance,Junior,3170,Married,Embu,16,Yes
+273,14743,Male,40,Associate,Junior,8595,Married,Taita,22,No
+274,10086,Male,21,Research Analyst,Mid,7510,Divorced,Taita,4,Yes
+275,17414,Male,43,Data,Mid,1000,Married,Kisumu,15,No
+276,12636,Male,35,Data,Junior,6859,Single,Kiambu,2,Yes
+277,17726,Male,31,Data,Senior,3604,Divorced,Mombasa,9,No
+278,19310,Female,20,Finance,Mid,9029,Married,Taita,17,Yes
+279,16013,Male,48,Operations,Junior,2953,Divorced,Lamu,12,Yes
+280,14212,Male,18,Finance,Junior,6859,Married,Nairobi,3,No
+281,12955,Female,47,Finance,Mid,4472,Single,Nyeri,5,Yes
+282,12008,Female,22,Research Analyst,Senior,5340,Married,Kiambu,0,Yes
+283,14681,Male,50,Data,Mid,8595,Divorced,Mombasa,11,No
+284,18814,Female,29,Data,Senior,3170,Single,Nairobi,17,Yes
+285,15594,Male,18,Finance,Mid,8161,Divorced,Lamu,3,No
+286,17418,Female,38,Finance,Senior,2519,Single,Nairobi,4,Yes
+287,14008,Female,39,Operations,Junior,8378,Single,Taita,13,Yes
+288,14070,Male,24,Finance,Junior,9680,Single,Kirinyaga,2,Yes
+289,19742,Male,34,Operations,Mid,6859,Married,Laikipia,15,No
+290,15900,Male,40,Finance,Senior,6208,Single,Kisumu,6,No
+291,15528,Male,19,Research Analyst,Senior,3604,Divorced,Lamu,5,No
+292,15855,Male,31,Finance,Senior,7944,Divorced,Mombasa,4,Yes
+293,14581,Male,34,Data,Junior,1868,Divorced,Wajir,11,No
+294,19851,Male,31,Associate,Junior,3821,Single,Kiambu,7,Yes
+295,12517,Male,21,Operations,Mid,4472,Married,Lamu,10,No
+296,10222,Male,50,Research Analyst,Mid,1868,Married,Nyeri,21,Yes
+297,18564,Female,40,Operations,Mid,2302,Divorced,Nairobi,9,Yes
+298,18342,Female,42,Associate,Senior,1000,Married,Nyeri,8,No
+299,10115,Male,49,Data,Junior,3821,Single,Nyeri,20,No
+300,15031,Female,35,Research Analyst,Mid,4906,Married,Mombasa,24,No
+301,19794,Female,31,Data,Senior,3821,Married,Lamu,2,No
+302,18077,Female,37,Finance,Junior,1217,Married,Nyeri,10,No
+303,11175,Female,21,Finance,Mid,7510,Single,Taita,10,No
+304,15445,Female,37,Research Analyst,Mid,2736,Single,Nairobi,14,Yes
+305,14199,Female,18,Operations,Senior,5774,Single,Embu,9,No
+306,13832,Male,19,Research Analyst,Mid,6642,Married,Laikipia,19,Yes
+307,11335,Female,42,Operations,Junior,6859,Divorced,Kisumu,10,Yes
+308,11691,Male,43,Associate,Junior,4472,Divorced,Kisumu,11,Yes
+309,13185,Female,42,Finance,Junior,4906,Divorced,Mombasa,18,No
+310,19078,Female,48,Research Analyst,Mid,7293,Divorced,Mombasa,10,Yes
+311,14314,Male,32,Finance,Junior,8595,Single,Nyeri,2,Yes
+312,15491,Female,42,Research Analyst,Senior,9897,Divorced,Lamu,16,Yes
+313,14174,Female,33,Finance,Senior,7293,Divorced,Kiambu,10,Yes
+314,14554,Female,50,Data,Junior,3604,Single,Kisumu,15,No
+315,14289,Male,30,Associate,Mid,5991,Single,Lamu,22,Yes
+316,17765,Female,26,Operations,Senior,7510,Divorced,Embu,14,No
+317,10007,Female,50,Operations,Junior,1434,Married,Embu,13,No
+318,16068,Male,29,Finance,Mid,1868,Married,Taita,7,Yes
+319,18886,Male,27,Associate,Junior,5991,Single,Wajir,21,Yes
+320,15235,Female,26,Data,Mid,1217,Married,Wajir,0,No
+321,19375,Male,20,Data,Senior,4689,Married,Mombasa,3,Yes
+322,15074,Female,18,Research Analyst,Mid,5774,Divorced,Kisumu,22,Yes
+323,17113,Female,49,Data,Mid,5774,Married,Kirinyaga,18,No
+324,17902,Male,23,Data,Junior,9246,Single,Nairobi,10,No
+325,19740,Female,18,Associate,Junior,8378,Single,Kiambu,0,Yes
+326,13928,Male,46,Associate,Mid,7076,Married,Laikipia,4,Yes
+327,13927,Male,34,Associate,Mid,5774,Married,Wajir,15,No
+328,18504,Female,50,Data,Junior,8812,Single,Lamu,6,Yes
+329,13387,Female,29,Research Analyst,Senior,7510,Single,Lamu,2,Yes
+330,10917,Female,19,Research Analyst,Mid,7293,Divorced,Embu,24,Yes
+331,14326,Female,40,Operations,Mid,6425,Divorced,Kisumu,8,No
+332,17217,Female,50,Research Analyst,Mid,1217,Divorced,Kirinyaga,22,Yes
+333,18515,Male,45,Finance,Mid,6859,Single,Kisumu,16,Yes
+334,13191,Male,49,Operations,Junior,9897,Divorced,Kiambu,1,No
+335,19272,Male,48,Associate,Mid,6859,Married,Taita,2,Yes
+336,17445,Female,21,Associate,Junior,1434,Married,Lamu,1,Yes
+337,13984,Female,32,Associate,Senior,6642,Divorced,Wajir,11,No
+338,11363,Female,33,Data,Junior,6425,Divorced,Nairobi,19,No
+339,14811,Male,24,Associate,Mid,3821,Divorced,Nyeri,23,Yes
+340,16738,Female,23,Finance,Mid,6208,Single,Kiambu,23,No
+341,16906,Male,47,Operations,Senior,7727,Divorced,Kiambu,24,No
+342,10735,Female,30,Data,Junior,4906,Married,Kiambu,23,Yes
+343,14261,Male,37,Research Analyst,Mid,1434,Married,Embu,17,No
+344,18725,Female,49,Research Analyst,Senior,2736,Single,Wajir,22,No
+345,18925,Female,20,Finance,Junior,8812,Single,Nyeri,6,Yes
+346,11423,Male,45,Research Analyst,Senior,2953,Married,Lamu,19,Yes
+347,13299,Female,38,Associate,Mid,1651,Divorced,Kisumu,18,No
+348,15144,Female,21,Data,Senior,1217,Married,Kisumu,18,No
+349,10744,Male,26,Associate,Mid,1217,Married,Nyeri,5,Yes
+350,11222,Male,35,Research Analyst,Senior,5991,Married,Embu,14,Yes
+351,10842,Female,25,Research Analyst,Senior,1868,Divorced,Embu,1,No
+352,18848,Male,50,Operations,Mid,8812,Divorced,Embu,24,Yes
+353,16295,Female,19,Operations,Senior,7293,Single,Embu,21,No
+354,12145,Male,47,Finance,Senior,4689,Married,Kisumu,21,Yes
+355,18228,Female,36,Associate,Senior,6859,Divorced,Lamu,6,No
+356,14718,Male,36,Operations,Senior,4472,Single,Kiambu,16,Yes
+357,12459,Female,28,Research Analyst,Senior,9897,Married,Nairobi,11,Yes
+358,14252,Female,50,Finance,Junior,2953,Divorced,Laikipia,4,Yes
+359,13831,Female,49,Operations,Junior,1868,Single,Laikipia,20,Yes
+360,13088,Female,39,Finance,Senior,4906,Single,Nyeri,10,Yes
+361,17922,Male,46,Data,Junior,8812,Divorced,Wajir,17,No
+362,16540,Male,18,Operations,Junior,1434,Single,Mombasa,21,Yes
+363,14232,Male,24,Operations,Junior,9680,Single,Embu,20,No
+364,16450,Male,20,Finance,Junior,2519,Married,Embu,20,No
+365,19140,Female,39,Data,Junior,7727,Divorced,Taita,22,Yes
+366,19084,Male,20,Finance,Mid,4255,Married,Kisumu,18,No
+367,15169,Male,24,Research Analyst,Junior,5340,Divorced,Embu,16,Yes
+368,11951,Female,35,Finance,Junior,9463,Divorced,Nairobi,2,Yes
+369,19061,Female,28,Finance,Mid,7727,Divorced,Kiambu,5,Yes
+370,15912,Female,36,Finance,Mid,3821,Divorced,Kirinyaga,10,Yes
+371,16467,Female,19,Data,Junior,9680,Divorced,Kiambu,0,Yes
+372,18826,Male,45,Research Analyst,Mid,2085,Divorced,Embu,6,Yes
+373,10508,Male,39,Research Analyst,Mid,3387,Married,Mombasa,11,Yes
+374,19259,Male,44,Data,Mid,4472,Divorced,Wajir,12,Yes
+375,14272,Male,50,Associate,Mid,8595,Single,Embu,21,Yes
+376,17735,Male,49,Finance,Senior,5557,Divorced,Nairobi,8,No
+377,18419,Male,22,Operations,Junior,3821,Married,Lamu,18,No
+378,16720,Male,45,Operations,Senior,6642,Single,Kiambu,14,Yes
+379,19993,Male,42,Associate,Junior,6642,Divorced,Taita,5,Yes
+380,16071,Female,45,Data,Mid,7727,Single,Laikipia,2,Yes
+381,14730,Female,18,Associate,Mid,6859,Married,Wajir,19,Yes
+382,19685,Female,39,Associate,Senior,7293,Married,Nairobi,0,No
+383,15577,Male,50,Data,Junior,4689,Divorced,Wajir,10,No
+384,15123,Male,31,Data,Senior,4906,Married,Laikipia,12,Yes
+385,15800,Male,45,Associate,Senior,7076,Married,Nyeri,21,Yes
+386,13530,Female,39,Data,Senior,5774,Single,Nyeri,0,Yes
+387,16527,Male,36,Operations,Mid,9246,Single,Wajir,13,Yes
+388,12410,Female,40,Operations,Junior,2953,Married,Embu,23,Yes
+389,15118,Male,35,Operations,Junior,7944,Single,Nairobi,19,Yes
+390,12757,Female,41,Operations,Mid,3604,Single,Taita,4,No
+391,12035,Male,30,Associate,Mid,9680,Divorced,Wajir,24,Yes
+392,18665,Female,33,Operations,Mid,4472,Married,Laikipia,14,No
+393,17363,Female,50,Data,Junior,3387,Divorced,Taita,13,No
+394,10201,Female,44,Finance,Mid,2519,Divorced,Kirinyaga,14,Yes
+395,11778,Male,26,Data,Senior,8812,Divorced,Kisumu,6,Yes
+396,13728,Female,47,Operations,Junior,4038,Single,Taita,4,Yes
+397,11887,Male,18,Research Analyst,Junior,8812,Divorced,Embu,1,No
+398,19778,Female,25,Operations,Junior,9897,Single,Taita,22,Yes
+399,14151,Female,49,Data,Mid,8378,Married,Kiambu,10,Yes
+400,18049,Male,44,Operations,Mid,1434,Divorced,Kiambu,18,Yes
+401,17020,Female,38,Associate,Junior,5557,Divorced,Wajir,20,No
+402,13983,Female,30,Associate,Mid,2736,Single,Lamu,6,No
+403,14588,Female,20,Finance,Senior,2085,Divorced,Wajir,23,Yes
+404,17770,Male,30,Data,Senior,6425,Divorced,Lamu,18,No
+405,12042,Female,43,Data,Senior,4689,Single,Nyeri,2,No
+406,10569,Male,26,Operations,Mid,2736,Single,Embu,19,Yes
+407,19872,Female,44,Data,Senior,1217,Single,Kirinyaga,18,Yes
+408,11760,Female,38,Associate,Mid,1868,Married,Nairobi,19,Yes
+409,10764,Male,26,Data,Mid,6642,Divorced,Kirinyaga,15,Yes
+410,14913,Female,19,Research Analyst,Senior,5340,Divorced,Kiambu,12,Yes
+411,13637,Female,25,Finance,Mid,8378,Single,Laikipia,1,No
+412,12403,Male,34,Finance,Senior,5123,Single,Nairobi,5,Yes
+413,13291,Female,27,Operations,Senior,2953,Divorced,Kiambu,14,Yes
+414,12205,Male,42,Associate,Senior,5557,Married,Mombasa,16,Yes
+415,16288,Female,46,Research Analyst,Senior,8595,Married,Lamu,23,No
+416,19678,Male,25,Associate,Senior,6425,Divorced,Kisumu,23,No
+417,12984,Male,33,Data,Junior,6425,Single,Embu,1,Yes
+418,15024,Female,29,Research Analyst,Junior,8378,Married,Mombasa,18,Yes
+419,19826,Female,23,Associate,Mid,8378,Married,Taita,24,No
+420,18901,Female,39,Finance,Junior,2085,Divorced,Wajir,8,Yes
+421,17255,Female,29,Associate,Junior,6859,Single,Kiambu,8,Yes
+422,12483,Female,35,Finance,Mid,9897,Divorced,Lamu,12,No
+423,10823,Female,27,Finance,Mid,9463,Single,Kirinyaga,9,Yes
+424,18425,Female,47,Associate,Junior,3821,Divorced,Kiambu,11,Yes
+425,13879,Female,47,Research Analyst,Senior,5557,Single,Kiambu,14,No
+426,14367,Female,20,Data,Junior,8161,Married,Kiambu,10,No
+427,13458,Male,21,Operations,Mid,4038,Single,Nyeri,0,No
+428,14667,Male,34,Data,Senior,4038,Married,Nairobi,4,No
+429,12853,Female,32,Associate,Mid,1651,Married,Laikipia,7,Yes
+430,16316,Male,19,Operations,Mid,1000,Divorced,Lamu,23,Yes
+431,10903,Female,19,Research Analyst,Senior,8161,Divorced,Mombasa,23,No
+432,17208,Male,35,Finance,Senior,7727,Divorced,Laikipia,4,Yes
+433,16351,Male,41,Research Analyst,Junior,6859,Married,Mombasa,24,No
+434,18794,Male,21,Data,Junior,2519,Divorced,Nairobi,14,No
+435,12153,Female,49,Research Analyst,Mid,1217,Single,Nyeri,11,No
+436,18072,Male,30,Associate,Senior,9680,Single,Kirinyaga,5,No
+437,15471,Male,18,Operations,Mid,4689,Married,Laikipia,24,No
+438,10474,Female,34,Operations,Mid,1217,Single,Kisumu,24,Yes
+439,10725,Male,38,Operations,Junior,9680,Married,Wajir,4,No
+440,11443,Female,35,Finance,Mid,4255,Married,Taita,6,Yes
+441,15212,Female,26,Data,Mid,8378,Divorced,Kirinyaga,7,Yes
+442,18657,Male,26,Research Analyst,Senior,7510,Divorced,Embu,10,Yes
+443,14477,Male,18,Research Analyst,Senior,2953,Divorced,Taita,22,No
+444,19154,Female,29,Finance,Mid,1000,Single,Kirinyaga,18,No
+445,13342,Male,28,Data,Senior,2519,Single,Kirinyaga,20,No
+446,19854,Female,35,Data,Senior,7510,Single,Mombasa,23,Yes
+447,17497,Male,20,Data,Mid,8378,Divorced,Nyeri,1,Yes
+448,19081,Female,29,Finance,Junior,2519,Single,Kirinyaga,0,Yes
+449,10363,Male,25,Data,Senior,8595,Married,Mombasa,7,Yes
+450,11202,Male,37,Associate,Senior,4689,Married,Kiambu,13,No
+451,19604,Male,43,Associate,Mid,1434,Single,Nyeri,20,No
+452,15150,Female,27,Data,Senior,9897,Married,Nairobi,12,Yes
+453,13579,Female,50,Research Analyst,Senior,2302,Married,Kiambu,2,Yes
+454,16885,Female,41,Operations,Mid,5557,Married,Kiambu,13,No
+455,16396,Male,45,Finance,Mid,4906,Single,Wajir,16,No
+456,16910,Female,37,Finance,Mid,8595,Married,Kirinyaga,22,Yes
+457,10664,Female,40,Data,Mid,9463,Divorced,Mombasa,9,No
+458,16589,Male,30,Associate,Senior,1651,Divorced,Mombasa,5,Yes
+459,11736,Female,23,Associate,Mid,8161,Married,Mombasa,22,No
+460,12968,Female,20,Associate,Senior,7944,Divorced,Nairobi,16,Yes
+461,18198,Female,21,Operations,Mid,4906,Divorced,Lamu,22,No
+462,15549,Female,29,Associate,Junior,3604,Divorced,Taita,11,Yes
+463,10651,Female,42,Operations,Mid,2736,Single,Kirinyaga,4,No
+464,11342,Female,19,Finance,Senior,7510,Married,Kiambu,8,Yes
+465,10503,Female,48,Operations,Senior,6859,Divorced,Embu,5,No
+466,10816,Male,33,Research Analyst,Senior,2953,Single,Lamu,23,Yes
+467,15029,Male,39,Data,Mid,4906,Single,Embu,2,No
+468,13950,Male,19,Data,Senior,8595,Single,Lamu,22,No
+469,17342,Female,44,Research Analyst,Mid,6642,Divorced,Nyeri,24,Yes
+470,18034,Male,38,Research Analyst,Junior,9463,Single,Wajir,20,Yes
+471,13348,Male,39,Finance,Mid,7293,Divorced,Kiambu,2,Yes
+472,17949,Female,31,Associate,Junior,6208,Married,Kiambu,16,Yes
+473,17052,Male,42,Finance,Junior,6208,Divorced,Kirinyaga,20,No
+474,11483,Female,50,Operations,Junior,1000,Married,Kiambu,1,Yes
+475,14340,Female,40,Operations,Junior,7727,Married,Kirinyaga,12,Yes
+476,11082,Male,18,Operations,Senior,9897,Divorced,Kisumu,9,Yes
+477,16746,Female,43,Research Analyst,Senior,4689,Married,Laikipia,11,No
+478,10561,Male,29,Operations,Junior,3604,Single,Mombasa,23,Yes
+479,19716,Male,39,Data,Junior,2953,Divorced,Nairobi,16,No
+480,12848,Male,23,Research Analyst,Mid,5557,Single,Nairobi,6,Yes
+481,16352,Female,18,Associate,Senior,8595,Single,Embu,7,Yes
+482,19295,Male,34,Finance,Mid,3170,Divorced,Taita,8,No
+483,11411,Female,49,Associate,Junior,4689,Married,Laikipia,13,Yes
+484,11183,Male,40,Finance,Junior,8812,Divorced,Lamu,12,No
+485,12405,Female,48,Finance,Senior,7293,Single,Kiambu,17,Yes
+486,18633,Male,32,Research Analyst,Junior,7076,Divorced,Mombasa,12,No
+487,19363,Female,38,Associate,Junior,8378,Divorced,Nyeri,0,No
+488,16833,Female,46,Associate,Senior,9246,Single,Kirinyaga,11,Yes
+489,11958,Female,37,Operations,Senior,5774,Divorced,Kiambu,17,No
+490,15781,Male,25,Data,Mid,7510,Single,Wajir,22,No
+491,10847,Male,25,Research Analyst,Mid,7727,Single,Kisumu,22,Yes
+492,11226,Male,39,Research Analyst,Senior,2519,Divorced,Wajir,8,Yes
+493,18767,Female,44,Finance,Mid,9680,Single,Taita,17,Yes
+494,18523,Female,28,Finance,Junior,1000,Married,Nairobi,17,No
+495,16313,Female,23,Operations,Senior,5557,Married,Taita,23,Yes
+496,14383,Female,23,Associate,Mid,6425,Married,Kisumu,24,Yes
+497,17013,Male,33,Data,Junior,1651,Married,Kirinyaga,20,No
+498,15867,Female,20,Finance,Junior,2519,Single,Nyeri,8,No
+499,16114,Female,22,Finance,Junior,2736,Divorced,Mombasa,24,Yes
