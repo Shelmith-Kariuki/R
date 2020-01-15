@@ -21,6 +21,12 @@ rm(list = ls())
 
 image_path = "C:/Users/user/Documents/Github/R/Images"
 knitr::include_graphics(paste(image_path,"DFK Image.PNG",sep="/"))
+## Create a vector of the required libraries
+  ### dplyr: Manipulating datasets
+  ### lubridate: Dealing with dates
+  ### tidyr: Reshaping data
+  ### ggplot: Plotting beautiful plots
+
 ```
 
 ### Introduction
@@ -37,13 +43,10 @@ The data used herein comes from the Data Science Nigeria Loan Prediction challen
 <br>
 ```{r,echo=TRUE, warning=FALSE,message=FALSE,include=TRUE}
 
-## Create a vector of the required libraries
-  ### dplyr: Manipulating datasets
-  ### lubridate: Dealing with dates
-  ### tidyr: Reshaping data
-  ### ggplot: Plotting beautiful plots
+## All the packages below are installed on my system, except factory
 
-pkgs <- c("dplyr","lubridate","tidyr","ggplot2","stringr","kableExtra")
+pkgs <- c("dplyr","lubridate","tidyr","ggplot2","stringr","kableExtra",
+          "DT","ggthemes","factory")
 
 
 ## Check if there are variables you want to load, that are not already installed. 
@@ -60,7 +63,7 @@ invisible(lapply(pkgs,library,character.only=TRUE))
 ## Remove the objects that are no longer required
 rm(miss_pkgs)
 rm(pkgs)
-rm(vars)
+
 ```
 
 ### Setting the plot theme

@@ -1,0 +1,215 @@
+---
+title: <strong><center>Beyond ordinary mutate(),summarise() functions</strong></center>
+author: <strong><center>Shelmith</strong></center>
+date: <strong><center>1/14/2020</strong></center>
+output: html_document
+---
+
+I have comfortably used the ordinary mutate(),summarise() functions for almost 3 years now, but I thought it is high time I tried the different variations i.e mutate_all(), mutate_if(), mutate_at(),summarise_all(), summarise_if(), summarise_at(). I will also share some other tricks that I came acroos, while learning these functions.
+
+Motivation of preparing this R Markdown document is derived from Suzan Bert's article found [here](https://suzan.rbind.io/2018/02/dplyr-tutorial-2/).
+
+We will use the "Wafanyikazi" dataset that can be found on the [rChambua](https://github.com/Shelmith-Kariuki/rChambua) pakage. This dataset is totally hypothetical. I generated it after wanting a dataset that I could play with all the time.
+
+### 0. Load the packages that we will require
+<br> 
+
+```{r,warning=FALSE, message=FALSE}
+
+## Create a vector of packages that we will need
+pkgs <- c("dplyr")
+
+## Check if there are variables you want to load, that are not already installed. 
+miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]] 
+
+## Installing the missing packages
+if(length(miss_pkgs)>0){
+  install.packages(miss_pkgs)
+}
+
+## Loading all the packages
+invisible(lapply(pkgs,library,character.only=TRUE))
+
+## Remove the objects that are no longer required
+rm(miss_pkgs)
+rm(pkgs)
+
+## Install rChambua from Github, and load it
+#install.packages("rChambua")
+library("rChambua")
+
+```
+
+### 1. Read in the dataset, and inspect it using glimpse()
+<br> 
+
+```{r,warning=FALSE, message=FALSE}
+df <- wafanyikazi
+
+glimpse(df)
+```
+
+### 2. mutate()
+
+This is usually the norm for me. 
+
+Let us generate a Swahili version of Gender, call it Jinsia, which should have the values "Mme" inplace of "Male", and "Mke" inplace of "Female".
+
+<br> 
+```{r,warning=FALSE, message=FALSE}
+
+df <- df %>% 
+  mutate(Jinsia = ifelse(Gender == "Female", "Mke", "Mme"))
+glimpse(df)
+
+head(df, 10)
+```
+
+### 3. mutate_all()
+
+This function is used to implement a function on all the variables.
+
+The syntax is written as:
+mutate_all(inbuilt function) or
+mutate_all(~(custom function with a "." representing each var)) or
+mutate_all(funs(custom function with a "." representing each var)) 
+
+Let us assume that we want to include an "_x" at the end of each value, in all the variables
+
+<br>
+```{r,warning=FALSE, message=FALSE}
+
+df2 <- df %>% 
+  mutate_all(~paste0(.,"_x"))
+
+df2 <- df %>% 
+  mutate_all(funs(paste0(.,"_x")))
+
+head(df2, 10)
+
+rm(df2)
+```
+
+Seems as though funs() is deprecated, when using mutate_all().
+
+### 4. mutate_if()
+
+Used to implement a function on some variables, if they meet a certain condition.
+
+The syntax as written as: mutate_if(condition that the variables should meet, the function to be implemented).
+
+Let us generate a dataset that contains all the numeric variables mutiplied by 100,
+and all the factor/character variables converted to lower case.
+
+<br> 
+```{r,warning=FALSE, message=FALSE}
+
+df2 <- df %>% 
+  mutate_if(is.numeric, ~(.*100))
+
+df2 <- df %>% 
+  mutate_if(is.factor, tolower)
+
+df2 <- df %>% 
+  mutate_if(is.factor, ~(paste("New_",tolower(.))))
+
+head(df2, 10)
+rm(df2)           
+```
+
+### 5. mutate_at()
+
+Used to implement a function on some selected variables
+
+The syntax as written as: mutate_at(vars(variables), function to be implemented)
+
+Generate a dataset that contains the variables age and income divided by 5.
+<br>
+
+```{r,warning=FALSE, message=FALSE}
+
+df2 <- df %>% 
+  mutate_at(vars(Age, Income), funs(div =./5))
+
+head(df2, 10)
+rm(df2) 
+
+```
+
+### 6. summarise_all()
+<br>
+
+```{r,warning=FALSE, message=FALSE}
+
+
+  
+```
+
+### 7. summarise_if()
+
+<br> 
+```{r,warning=FALSE, message=FALSE}
+
+tab_mean <- df %>% 
+  group_by(Department) %>% 
+  summarise_if(is.numeric, mean, na.rm = TRUE) %>% 
+  mutate(metric = "Mean")
+tab_mean
+
+tab_median <- df %>% 
+  group_by(Department) %>% 
+  summarise_if(is.numeric, median, na.rm = TRUE) %>% 
+  mutate(metric = "Median")
+tab_median
+
+tab <-bind_rows(tab_mean, tab_median)
+tab
+
+rm(tab_mean)
+rm(tab_median)
+rm(tab)
+
+
+```
+
+### 8. summarise_at()
+<br> 
+
+```{r,warning=FALSE, message=FALSE}
+
+tab <- df %>% 
+  summarise_at(vars(Age,Leave_Days), max)
+tab
+```
+
+### 9. unite()
+
+Used to combine two variables or more, into 1
+
+<br> 
+```{r,warning=FALSE, message=FALSE}
+df <- df %>% 
+  mutate_at(vars(Gender, County), as.character) %>% 
+  unite(United, Gender, County, sep=":",remove = F)
+head(df, 10)
+```
+
+### 10. Generating a dataset of counts, grouped by two variables, and arranging the counts by ascending / descending order,
+
+<br> 
+```{r,warning=FALSE, message=FALSE}
+##  Before
+
+tab <- df %>% 
+  group_by(Gender, Department) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count))
+tab
+##  Now
+
+tab <- df %>% 
+  count(Gender, Department, sort = T,name = "count")
+tab
+```
+
+

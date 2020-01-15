@@ -1,0 +1,265 @@
+---
+title: <center><strong>WeAreRLadies Curation</strong></center>
+author: <center><strong><h1>[Shelmith Nyagathiri Kariuki](https://github.com/Shelmith-Kariuki)</h1></strong></center>
+date: <center><strong><h2>September 8, 2019</h2></strong></center>
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+<br>
+```{r,echo=TRUE, warning=FALSE,echo=FALSE,message=FALSE,include=TRUE}
+
+## All the packages below are installed on my system, except factory
+
+pkgs <- c("dplyr","lubridate", "tidyr","kableExtra","ggplot2","dotwhisker","ggthemes")
+
+
+
+## Check if there are variables you want to load, that are not already installed. 
+miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]] 
+
+## Installing the missing packages
+if(length(miss_pkgs)>0){
+  install.packages(miss_pkgs)
+}
+
+## Loading all the packages
+invisible(lapply(pkgs,library,character.only=TRUE))
+
+## Remove the objects that are no longer required
+rm(miss_pkgs)
+rm(pkgs)
+
+## Create an object of the theme we want
+my_theme<-  theme(legend.position = "right", 
+                 legend.direction = "vertical",
+                 legend.title = element_blank(),
+                 plot.title = element_text( size = rel(1.4), hjust = 0.5),
+                plot.subtitle = element_text(size = rel(1.4), hjust = 0.5),
+                 #axis.text = element_text( size = rel(1.5)),
+                 axis.text.x = element_text(size =rel(1.3),angle = 0),
+                 axis.text.y = element_text(size =rel(1.3),angle = 0),
+                 axis.title = element_text( size = rel(1.3)),
+                 panel.background = element_rect(fill = NA))
+
+
+```
+
+### 1. Hyperlinks in R
+
+
+You can also find me on twitter,@[Shel_Kariuki](https://twitter.com/Shel_Kariuki)
+
+
+```{r , include=TRUE,echo=FALSE,eval=FALSE}
+### 2. Emojis in R
+
+# Check the repo [here](https://github.com/hadley/emo)
+# Install the devtools package
+## install.packages("devtools")
+
+# Using devtools, install the emo package.
+## devtools::install_github("hadley/emo")
+
+# ji is a function is emo...lol!! emo::ji (brilliant)
+emo::ji("heart")
+
+rep(emo::ji("smile"),20)
+
+emo::ji("insect")
+```
+
+
+
+
+```{r , include=TRUE,echo=FALSE,eval=FALSE}
+
+### 3. tictoc system
+## Install and load the beepr package. It plays a sound when the code is done running.
+
+## install.packages("beepr") 
+library(beepr)
+
+## Indicate the start time
+tic <- Sys.time()
+
+## Read in some dataset
+data <-read.csv("~/Desktop/page_log.csv")
+## this is taking forever. I am so impatient, is it the code, or my comp? 
+## Make the dataset 3 times larger
+data2 <- rep(data,3)
+
+## Write the code that plays the tone
+beep(5) ## 5 here represents the tone serial number.e.g 4 would be a different tone
+
+## Indicate the end time
+toc <- Sys.time()
+
+## Calculate and print the length of time it takes to read in the large dataset
+print(toc-tic)
+```
+
+
+### 2. User defined functions
+
+```{r , include=TRUE, echo=FALSE, message=F, warning=F,results = 'asis'}
+
+## Create a function that produces a table, and a graph
+summ_function <- function(data, xvar, xlab){
+  
+### Generate a summary statistics table
+summ_table <- data %>% 
+  group_by_(xvar) %>% ## this function is deprecated, but still works
+  summarise(count = n()) %>% 
+  mutate(perc = round((count/sum(count))*100,0))
+
+### Print the summary statistics table
+print(kable_styling(kable(summ_table,col.names = c(xlab,"Frequency","Percentage"))))
+
+### Generate a graph based on the summary table shown above
+
+summ_graph <- ggplot(summ_table, aes_string(x=xvar,y="perc"))+
+              geom_bar(stat = "identity", fill="brown")+
+              geom_text(aes(label =perc),vjust = -0.25, size = 4)+
+              my_theme+
+              labs(title = paste("Distribution of",xlab),x=xlab,
+                   y="Percentage")
+print(summ_graph)
+  
+}
+
+## Generate a vectors containing the variables whose summary statistics you want to obtain, and their labels
+
+data <- infert
+
+vars<- c("education","parity","induced","spontaneous")
+
+xlabs <- tools::toTitleCase(vars)
+
+## Generate a loop function that produces results for all the variables, together
+for(i in 1: length(vars)){
+  summ_function(data, vars[i],xlabs[i])
+}
+
+##Remove unnecessary objects
+rm(summ_graph)
+rm(summ_table)
+rm(xlabs)
+rm(vars)
+
+```
+
+
+## 3. Visualisation of regression results
+
+```{r , include=TRUE,echo=FALSE,eval=TRUE}
+## load the dotwhisker package that contains the dwplot function
+library(dotwhisker)
+
+## Load the datarium library that contains the marketing data
+library(datarium)
+
+## Attach the marketing data
+mdata<- marketing   
+
+## Fit the regression model
+model1 <- lm(sales ~ youtube + facebook + newspaper, data = mdata)
+summary(model1)
+
+## Generate a neat dataset of the regression results
+model_tidy <- broom::tidy(model1)
+
+## Generate a plot showing the regression results
+plot1<-dwplot(model_tidy,
+         dot_args = list(color = "black"),
+         whisker_args = list(color = "purple"),
+         vline = geom_vline(xintercept = 0, colour = "red", linetype = 2)) %>%
+      relabel_predictors(c(youtube = "Youtube",
+                           facebook = "Facebook",
+                           newspaper = "Newspaper"))+
+      labs(title = "Regression results",x="Coefficient Estimate",y="",
+           subtitle = "\n(sales ~ youtube + facebook + newspaper)") +
+   theme_hc()+ my_theme
+plot1
+
+```
+
+```{r , include=TRUE, echo=FALSE,eval=FALSE}
+### 4. Statistical tests by hand, in R and in Python
+
+## See [this link](https://kariukishel.netlify.com/posts/t-tests/)
+```
+
+
+```{r , include=TRUE,echo=FALSE,eval=FALSE}
+
+### 5. datapasta
+
+## See [this link](https://github.com/MilesMcBain/datapasta) for more on datapasta
+
+
+##install.packages("datapasta")
+
+## Set the keyboard shortcuts using Tools -> Addins -> Browse Addins, then click Keyboard Shortcuts...
+
+## Copy and paste some dataset from another source into R
+
+```
+
+
+
+
+```{r , include=TRUE,echo=FALSE,eval=FALSE}
+
+### 6. ggThemeAssist
+## Install and load the ggtheme package
+## install.packages("ggThemeAssist")
+library("ggThemeAssist")
+library("tidyverse")
+
+## We will use infert dataset, that is inbuilt in R
+
+case_plot <- infert %>% 
+  group_by(case) %>% 
+  summarise(count = n()) %>% 
+  mutate(perc = round(count/sum(count)*100,1)) %>% 
+  ggplot(aes(x = as.factor(case), y=perc))+
+  geom_bar(stat="identity",fill = "brown") + 
+  theme(plot.subtitle = element_text(vjust = 1), 
+    plot.caption = element_text(vjust = 1), 
+    axis.title = element_text(size = 16,  face = "bold"),
+    axis.text = element_text(size = 12), 
+    plot.title = element_text(size = 20, face = "bold", hjust = 0.5), 
+    panel.background = element_rect(fill = NA)) +
+  labs(title = "Distribution of Case", x = "Case", y = "Percentage")
+case_plot
+```
+
+
+
+
+```{r , include=TRUE,echo=FALSE,eval=FALSE}
+
+### 7. Unfactor variables / vectors
+
+vec <-c(1, 0, 0, 0, 1, 0, 0, 0)
+vec2 <-factor(vec)
+levels(vec2)
+
+##  before
+vec3a <-as.numeric(as.character(vec2))
+str(vec3a)
+levels(vec3a)
+
+## after
+
+vec3b <-varhandle::unfactor(vec2)
+str(vec3b)
+levels(vec3b)
+
+
+```
+

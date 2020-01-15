@@ -1,0 +1,147 @@
+---
+title: <strong><center>Factorizing variables in R</strong></center>
+author: <strong><center>Shelmith Kariuki</strong></center>
+date: <strong><center>1/15/2020</strong></center>
+output: html_document
+---
+
+There are 5 ways (that I know of) in which we can factor variables in R.
+
++ One by one (an option for beginners).
++ Using a for loop.
++ sapply()
++ forcats::fct_relevel()
++ purrr::map()
+
+### 0. Load the packages that we will require
+<br> 
+
+```{r,warning=FALSE, message=FALSE}
+
+## Create a vector of packages that we will need
+pkgs <- c("dplyr","purrr","repurrrsive")
+
+## Check if there are variables you want to load, that are not already installed. 
+miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]] 
+
+## Installing the missing packages
+if(length(miss_pkgs)>0){
+  install.packages(miss_pkgs)
+}
+
+## Loading all the packages
+invisible(lapply(pkgs,library,character.only=TRUE))
+
+## Remove the objects that are no longer required
+rm(miss_pkgs)
+rm(pkgs)
+
+## Install rChambua from Github, and load it
+#install.packages("rChambua")
+library("rChambua")
+
+```
+
+Assuming you have a matrix type question (where respondents were asked to rate the questions on a scale of 1 - 5, where 1 represents Strongly Disagree and 5 represents Strongly Agree). 
+<br>
+```{r,warning=FALSE, message=FALSE}
+
+set.seed(2020)
+
+vec <- 1:5
+Questions <- paste0("Opinion_",vec)
+opinion_df <- data.frame(matrix("", ncol=5, nrow=200))
+names(opinion_df) <- Questions
+
+for(i in 1: length(Questions)){
+ opinion_df[,Questions[i]] <- sample(c("Strongly Agree", "Agree","Neutral","Disagree", "Strongly Disagree"),size = 200,replace = TRUE) 
+}
+
+head(opinion_df, 10)
+```
+
+### 1. Factorizing one by one
+<br>
+```{r,warning=FALSE, message=FALSE}
+opinion_df2 <- opinion_df
+
+## Opinion_1
+opinion_df2$Opinion_1 <- factor(opinion_df2$Opinion_1,
+                                levels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"),
+                                labels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"))
+
+## Opinion_2
+opinion_df2$Opinion_2 <- factor(opinion_df2$Opinion_2,
+                                levels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"),
+                                labels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"))
+
+## Sorry, I cannot continue with this replication
+
+```
+
+### 2. Using a for loop
+<br>
+```{r,warning=FALSE, message=FALSE}
+
+opinion_df3 <- opinion_df
+
+factor_function <- function(data,var){
+  data[,var] <- factor(data[,var],
+                  levels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"),
+                  labels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"))
+  
+  return(data[,var])
+}
+
+for( i in 1:length(Questions)){
+ opinion_df3[,Questions[i]] <- factor_function(opinion_df3,Questions[i])
+ print(levels(opinion_df3[,Questions[i]]))
+}
+
+```
+
+### 3. Using sapply(). 
+
+Okay sapply() is kind of usually moody at times, and this was one of those days. So I used lapply, and it works.
+<br>
+
+```{r,warning=FALSE, message=FALSE}
+
+# factor_function <- function(data,var){
+#   data[,var] <- factor(data[,var],
+#                   levels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"),
+#                   labels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"))
+#   
+#   return(data[,var])
+# }
+
+opinion_df <- data.frame(opinion_df)
+
+opinion_df4 <- as.data.frame(lapply(opinion_df, function(x) factor(x,
+            levels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"),
+            labels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"))),check.names = FALSE)
+
+
+```
+
+### 4. Using purrr::map()
+<br>
+The syntax is written  as map(.x,.f) i.e for each element of .x, do .f
+<br> 
+```{r,warning=FALSE, message=FALSE}
+
+opinion_df5 <-bind_rows(map(opinion_df, ~factor(.x,
+ levels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"),
+ labels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"))))
+
+```
+
+### 5. Using forcats::fct_relevel()
+<br>
+```{r}
+
+opinion_df6 <- opinion_df %>%
+  dplyr::mutate_all(forcats::fct_relevel, "Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree")
+
+```
+

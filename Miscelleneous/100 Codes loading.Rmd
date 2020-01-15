@@ -1,0 +1,100 @@
+---
+title: "Self Development"
+author: "Shelmith Kariuki"
+date: "11/8/2018"
+output: html_document
+---
+
+## Introduction
+
+I love coding. But most importantly, I love learning something new. So I have purposed to learn something new every day, and document it here
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+```{r,echo=FALSE, warning=FALSE,message=FALSE,include=FALSE}
+#####ii). Loading the required libraries
+
+rm(list=ls())
+# Loading/installing required packages
+pkgs <- c("dplyr", "foreign", "Hmisc", "data.table", "broom","stringi", "DT","treemap",
+          "haven", "shiny", "shinydashboard", "leaflet", "tools","purrr","assertthat",
+          "highcharter", "tidyr", "RColorBrewer", "ggmap", "rgdal", "rgeos", 
+          "maptools", "dplyr", "tmap", "sp","tidyverse", "weights", "rlang", "dummies")
+
+miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]] # vector of missing packages
+
+# Installing the missing packages
+if(length(miss_pkgs)>0){
+  install.packages(miss_pkgs)
+}
+
+# Loading all the packages
+invisible(lapply(pkgs,library,character.only=TRUE))
+rm(miss_pkgs)
+rm(pkgs)
+```
+
+```{r,echo=FALSE, warning=FALSE,message=FALSE,include=FALSE}
+
+# Set the theme
+self_theme<-theme(legend.position = "bottom",
+                  legend.title = element_blank(),
+  axis.line=element_blank(),
+  plot.title = element_text(family="Source Sans Pro Semibold", 
+                            size = rel(1.2), hjust = 0.5),
+  plot.subtitle = element_text(size = rel(1), hjust = 0.5),
+  axis.text = element_text(family = "Source Sans Pro Semibold", size = rel(0.9)),
+  axis.text.x = element_text(vjust = 1, hjust = 0.6),
+  axis.title = element_text(family = "Source Sans Pro Semibold", size = rel(1.0)),
+  legend.text = element_text(family = "Source Sans Pro Semibold", size = rel(1.0)),
+  panel.background = element_rect(fill = NA))
+```
+
+##### Plotting highchart pie charts in R
+
+```{r,echo=FALSE, warning=FALSE,message=FALSE,fig.width=10,rows.print=5,results='asis'}
+
+saveRDS(infert,"/Users/shelmith/Documents/Github/R/infert.rds")
+dat_infert = readRDS("/Users/shelmith/Documents/Github/R/infert.rds")
+
+case_infert = dat_infert%>%
+  group_by(case)%>%
+  summarise(count = n())%>%
+  mutate(perc = round((count/sum(count))*100,2))%>%
+  mutate(case = paste("Case",case,sep = "_"))
+
+case_hc1 = highchart() %>% 
+  hc_chart(type = "pie",options3d = list(enabled = TRUE, alpha = 70, beta = 0)) %>% 
+  hc_plotOptions(pie = list(depth = 50)) %>% 
+  hc_add_series_labels_values(case_infert$case, round(case_infert$perc,2), innerSize = "60%", 
+                              size='100%', dataLabels = list(distance = -40, format = '{point.y}%')) %>%
+  hc_tooltip(valueDecimals = 2,
+             pointFormat = "Percent: {point.y}%")
+case_hc1
+
+## If you do not want 3d, remove the options3d option.
+## If you do not want space in the middle, remove the innerSize option.
+
+library(ggiraph)
+
+g <- ggplot(mpg, aes( x = class, tooltip = class,
+        data_id = class ) ) +
+  geom_bar_interactive()
+ggiraph(code = print(g))
+g
+
+dat <- data.frame( name = c( "David", "Constance", "Leonie" ),
+gender = c( "Male", "Female", "Female" ),
+height = c(172, 159, 71 ) )
+g <- ggplot(dat, aes( x = name, y = height, tooltip = gender,
+data_id = name ) ) +
+geom_bar_interactive(stat = "identity")
+ggiraph(code = print(g))
+```
+
+

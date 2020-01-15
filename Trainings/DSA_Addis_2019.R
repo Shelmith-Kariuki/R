@@ -5,7 +5,7 @@
 	# Faith Kwamboka Okong'o
 	# Betty Khaindi Okumu
 	# Louisa Kamwele
-#### Project: Data Sience Africa, 2019 (Addis)
+#### Project: Data Science Africa, 2019 (Addis)
 #### Date created: 2nd June,2019
 
 
@@ -23,7 +23,7 @@
   #### I came %>% I saw %>% I conquered
 
 ## Loading the dplyr package.
-install.packages("dplyr") # intsalls the dplyr package
+install.packages("dplyr") # installs the dplyr package
 library(dplyr) # loads the dply package
 
 ## Reading in the data

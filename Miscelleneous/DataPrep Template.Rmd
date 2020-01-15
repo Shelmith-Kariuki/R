@@ -1,0 +1,190 @@
+---
+title: <center><strong>Data Prep Template</strong></center>
+date: <center>23/11/2019</center>
+output:
+  html_document: 
+    toc: yes
+    toc_depth: 6
+---
+
+These document contains functions that I use for data prep at work.
+<br>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+## 0. Specify all the functions to be used in this analysis
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+
+### 1. package_func: A function for installing packages
+
+package_func <- function(pkgs){
+
+miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]]
+
+## Install the missing packages
+
+if(length(miss_pkgs)>0){
+  install.packages(miss_pkgs)
+}
+
+## Loading all the packages
+
+invisible(lapply(pkgs,library,character.only=TRUE))
+
+## Remove the objects that are no longer required
+
+rm(miss_pkgs)
+rm(pkgs)
+
+}
+# e.g.
+## pkgs <- c("dplyr","lubridate","tidyr","ggplot2","kableExtra","openxlsx","readxl","janitor","data.table","haven","stringr","DT")
+## package_func(pkgs)
+
+
+### 2. factor_func: A function for factoring variables
+factor_func <- function(data, var, levs) {
+  
+data[,var] <- factor(data[,var],
+                    levels = levs,
+                    labels = levs) 
+return(data[,var])
+}
+
+#e.g.
+## df[,"Gender"]<- factor_func(df, "Gender", c("Male","Female"))
+## df[,"Role"]<- factor_func(df, "Role", c("Junior","Mid", "Senior"))
+
+### 3. sata_factor_func: A function for factoring select all variables
+
+pattern <- "specify pattern here"
+sata_vars <- grep(pattern, df, ignore.case = T, value = T)
+for(i in 1: length(sata_vars)){
+df[,sata_vars[i]] <- factor_func(df, sata_vars[i], levs)
+}
+
+```
+
+## 0. Install and load all the packages
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+
+pkgs <- c("dplyr","lubridate","tidyr","ggplot2","kableExtra","openxlsx","readxl","janitor","data.table","haven","stringr","DT","sjlabelled")
+
+package_func(pkgs)
+```
+
+
+
+
+## 1. Read in the dataset
+<br>
+
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+
+df <- read_xlsx("")
+
+```
+
+## 2. Covert "N/A"s to system N/As
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+
+
+```
+
+## 3. Remove system variables
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+
+
+```
+
+
+## 4. Remove duplicates
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+
+
+```
+
+
+## 5. Drop test cases
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+
+
+```
+
+## 6. Check that screeners worked
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+
+
+```
+
+## 7. Check that logics worked
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+
+
+```
+
+## 8. Factorise the single choice questions
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+## df[,"Gender"]<- factor_func(df, "Gender", c("Male","Female"))
+
+```
+
+## 9. Factorise the "select all that apply" questions
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+## df[,"Gender"]<- factor_func(df, "Gender", c("Male","Female"))
+
+```
+
+## 10. Cut back data
+
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+
+```
+
+## 11. Code open ended questions
+
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+
+```
+
+## 12. Organise the variables in the way they should appear in the data 
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+
+```
+
+## 13. Attach variable labels, this will make work easier and faster in SPSS
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+vars <- colnames(df)
+
+labs <- c("insert the variable labels here, as they appear in the subform")
+
+varlabel_df <- data.frame(vars, labs) ##This is used to just check that the variables and variable labels match
+
+df <- set_label(df, label = labs)
+
+```
+
+
+## 14. Save the data in the internal folder, as .xlsx and .sav
+<br>
+```{r, echo =FALSE, warning=FALSE, message=FALSE}
+
+```

@@ -1,8 +1,12 @@
 ################### 
-#### Title: Collapsing and Grouping Data
+#### Title: Data Manipulation in R
 #### Author: Shelmith Kariuki
-#### Project: 2018 Q4 Data Practicum
-#### Date created: 11th November, 2018
+#### Assistants:
+	# Faith Kwamboka Okong'o
+	# Betty Khaindi Okumu
+	# Louissah
+#### Project: Data Sience Africa, 2019 (Addis)
+#### Date created: 2nd June,2019
 
 
 ##*******************************dplyr*****************************************
@@ -22,7 +26,8 @@
 library(dplyr)
 
 ## Reading in the data
-loans_df<-read.csv("/Users/shelmith/Documents/Personal Development/R/Loans.csv")
+path<-"/Users/shelmith/Documents/Personal Development/R/Loans.csv")
+loans_df<-read.csv(path)
 
 ###1. select() : 
 
@@ -126,7 +131,8 @@ treatment_df_wide <- treatment_df_long %>%
 ## Read in the wafanyikazi dataset
 ## NB: This dataset is hypothetical. I simulated all of these values.
 
-wafanyikazi_df <- read.csv("/Users/shelmith/Documents/Personal Development/R/wafanyikazi.csv")
+path<-"/Users/shelmith/Documents/Personal Development/R/wafanyikazi.csv"
+wafanyikazi_df <- read.csv(path)
 
 ## Question 1: Calculate the minimum value, maximum value,  median,
 ## and Mean of age and income in wafanyikazi dataset.
@@ -189,22 +195,7 @@ gender_income <-  wafanyikazi_df %>%
   summarise(mean_income = mean(Income))
 
 
-
-## PIU HGSF recently conducted a Quick Polls Survey recently. Among the questions asked was 
-## "What role do you think you have to play in ensuring the success of the program in your community?"
-## The question was a multiple choice question. Tabulate the responses given. 
-## NB: Only CEq17 = "Yes", were asked that question.
-
-HGSF_QP = read.csv("/Users/shelmith/Documents/Personal Development/R/HGSF_QP.csv")
-
-HGSF_QP<-HGSF_QP %>%
-  filter(CEq17 == "Yes")%>%
-  gather("Role_Number","Roles",-sid,-X,-CEq17,na.rm = T)%>%
-  group_by(Roles)%>%
-  summarise(count = n())
-
-
-## Question 6: Which department has the largest difference in mean income,between males and females?
+## Question 5: Which department has the largest difference in mean income,between males and females?
 
 diff_average_income <- wafanyikazi_df %>%
   group_by(Department, Gender) %>%
@@ -214,7 +205,7 @@ diff_average_income <- wafanyikazi_df %>%
 
 ### Operations
 
-## Question 7: You are provided with the following data.
+## Question 6: You are provided with the following data.
 
 Year <- c(2010,2011,2012,2013,2014)
 Q1 <-c(1003,1532,954,841,823)
@@ -224,19 +215,20 @@ Q4 <-c(1122,1479,889,1174,1317)
 
 sales = data.frame(Year,Q1 ,Q2, Q3, Q4)
 
-## Question 7:1. Calculate the total sales per year.
+## Question 6:1. Calculate the total sales per year.
 sales_long <- sales %>%
   gather(Quarters, Sales_Values, -Year)
 
-## Question 7:2 Calculate the average sales per quarter.
+## Question 6:2 Calculate the average sales per quarter.
 
 avg_sales_quarter <- sales_long %>%
   group_by(Quarters)%>%
   summarise(avg_sales = mean(Sales_Values))
 
-## Question 8 (Optional): For the weather dataset given below, reshape the data to result 
-### to a dataset with the columns id,year, month,day,tmax and tmin. 
+## Question 7 (Optional): For the weather dataset given below, reshape the data to result into a dataset with the columns id,year, month,day,tmax and tmin. 
 ### Hint: The dataset should be a dataframe of 33 rows and 6 columns.
+path<-"/Users/shelmith/Documents/Personal Development/R/weather.csv"
 
-weather_df = read.csv("/Users/shelmith/Documents/Personal Development/R/weather.csv")
+weather_df = read.csv(path)
+
 
