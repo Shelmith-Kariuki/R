@@ -48,3 +48,13 @@ gene_df <- gene_df %>%
   ungroup() %>% 
   mutate(gene_name = paste(gene_name,counter,sep = "_")) %>% 
   select(-counter)
+
+
+x <- data.frame(Var1 = c("cat", NA, "bat", "hat", NA))
+
+x <- x %>% 
+  group_by(Var1) %>% 
+  mutate(counter = seq_along(Var1)) %>% 
+  ungroup() %>% 
+  mutate(Var1 = ifelse(is.na(Var1), paste0(Var1,counter),as.character(Var1))) %>% 
+  select(-counter)
