@@ -1,0 +1,260 @@
+---
+title: <center><strong>Trivago Case Study</strong></center>
+subtitle: <center><strong><h2>Challenge 428 - Building a predictive 'hits' model:Part 2</h2></strong></center>
+author: <center><strong><h1>[Shelmith Nyagathiri Kariuki](https://github.com/Shelmith-Kariuki)</h1></strong></center>
+date: <center><strong><h2>January 20, 2020</h2></strong></center>
+output:
+  html_document:
+    toc: yes
+    toc_depth: '6'
+    code_folding: hide
+---
+Trivago is an online company that meets the growing demand for independent travel information. It offers an extensive hotel meta search to travellers. 
+
+Trivago hosts different case studies on their website, that job applicants can work on.
+
+Details about this particular can be found can be found [here](https://jobs.zealpath.com/m/case/detail/428). 
+
+The variables of the dataset are defined below:
+
++ row_num: a number uniquely identifying each row.
+
++ locale: the platform of the session.
+
++ day_of_week: Mon-Fri, the day of the week of the session.
+
++ hour_of_day: 00-23, the hour of the day of the session.
+
++ agent_id: the device used for the session.
+
++ entry_page: describes the landing page of the session.
+
++ path_id_set: shows all the locations that were visited during the session.
+
++ traffic_type: indicates the channel the user cane through eg. search engine, email, ...
+
++ session_duration: the duration in seconds of the session.
+
++ hits: the number of interactions with the trivago page during the session.
+
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,fig.width = 12)
+
+```
+
+### 0. Install the libraries required
+<br>
+```{r,warning=FALSE, message=FALSE}
+
+## create a vector of packages to be installed
+pkgs <- c("tidyverse","data.table","DT","lubridate","ggthemes",
+          "randomForest","e1071","rpart","pROC","caret")
+
+## Check if there are packages you want to load, that are not already installed. 
+miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]] 
+
+## Installing the missing packages
+if(length(miss_pkgs)>0){
+  install.packages(miss_pkgs)
+}
+## Loading all the packages
+invisible(lapply(pkgs,library,character.only=TRUE))
+
+## Remove the objects that are no longer required
+rm(miss_pkgs)
+rm(pkgs)
+
+```
+
+
+<br>
+```{r,warning=FALSE, message=FALSE}
+### Setting the plot theme
+trivago_theme<- theme_hc()+ theme(legend.position = "right", 
+                 legend.direction = "vertical",
+                 legend.title = element_blank(),
+                 plot.title = element_text( size = rel(1.6), hjust = 0.5),
+                plot.subtitle = element_text(size = rel(1.5), hjust = 0.5),
+                 #axis.text = element_text( size = rel(1.5)),
+                 axis.text.x = element_text(size =rel(1.5),angle = 0),
+                 axis.text.y = element_text(size =rel(1.5),angle = 0),
+                 axis.title = element_text( size = rel(1.55)),
+                axis.line.x = element_line(size = 1.5, colour = "#c94a38"),
+                 panel.background = element_rect(fill = NA))
+
+### Colours that will be used for the plots 
+trivago_blue = "#007faf"
+trivago_orange = "#c94a38"
+trivago_yellow = "#f48f00"
+
+## Avoidance of scientific numbers
+options(scipen = 999)
+
+## Printing function
+pr_func<-function(data,cnames){
+datatable(data,colnames = cnames,
+  extensions = 'Buttons', options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'print')
+  )
+)
+}
+```
+
+### 1. Read in the datasets
+<br>
+```{r,warning=FALSE,message=FALSE}
+
+hits_df <- readRDS("ML Data Scientist Case Study Data_Clean.rds")
+
+```
+
+
+### 1. Run an outliers test to drop outliers in the session duration variable 
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+## Create a box plot to identify outliers.
+
+boxplot_graph <- ggplot(hits_df ,aes(y=hits))+
+              geom_boxplot(color = trivago_yellow,outlier.colour = trivago_blue)+
+              trivago_theme+
+              labs(title = "Distribution of Hits (with outliers)",
+                   y="Hits")
+boxplot_graph
+
+outliers <- boxplot(hits_df$hits, plot=FALSE)$out
+
+
+boxplot_graph <- ggplot(hits_df %>% filter(hits < min(outliers)) ,aes(y=hits))+
+              geom_boxplot(color = trivago_yellow,outlier.colour = trivago_blue)+
+              trivago_theme+
+              labs(title = "Distribution of Hits (without outliers)",
+                   y="Hits")
+boxplot_graph
+
+
+
+hits_df <- hits_df %>% 
+  filter(!session_duration %in% outliers)
+
+rm(boxplot_graph)
+```
+
+
+### 2. Select the variables to be used in fitting the predictive model
+
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+
+reg_df <- hits_df %>% 
+  select(row_num,locale,agent_id, entry_page,weekend,week_pos,hour_of_day2,num_locs,path_first0,  traffic_type, session_duration,hits)
+
+```
+
+### 3. Split the data into train and test. The test data will be the one with missing values in the hits variable.
+
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+
+train <- reg_df %>% filter(!is.na(hits))
+train<-train[complete.cases(train),]
+# train <- train[1:(nrow(train)/10),]
+
+test <- reg_df %>% filter(is.na(hits))
+# test <- test[1:(nrow(test)/10),]
+```
+
+### 4. Fit a Random Forest model to identify the variables that are highly important in predicting the number of hits.
+<br>
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+# rm(hits_df2)
+# rm(reg_df)
+# Fitting model
+forest <- randomForest(hits ~ ., data=train%>% select(-row_num,-entry_page),ntree=500)
+varImpPlot(forest,main = "Variable Importance in predicting number of hits")
+
+## Importance of variables
+## More useful variables achieve higher increases in node purities
+importance_dat = data.frame(forest$importance)
+importance_dat$variables <- row.names(importance_dat)
+importance_dat <-importance_dat %>%select(variables, IncNodePurity)
+importance_dat = arrange(importance_dat,desc(IncNodePurity))
+
+#Predict Output 
+train_pred= predict(forest,newdata = train,type = 'response')
+
+## Root Mean Squared error
+rmse <- RMSE(pred = train_pred,obs = train$hits)
+
+
+
+test_pred <- predict(forest,newdata=test %>% select(-hits),type = 'response')
+
+test2 <- test 
+test2$hits <- floor(test_pred)
+test2 <- test2 %>% select(row_num,hits)
+write.csv(test2,"RandomForest_results_full.csv")
+```
+
+### 5. Fit the prediction model using an SVM model.
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+# Fit the model
+svm_model <- svm(hits ~ .,
+                 data=train%>% select(-row_num,-entry_page),
+                 kernel = "radial",
+                 type = "nu-regression")
+svm_model
+
+## Predict Output 
+train_pred= predict(svm_model,newdata=train ,type = 'response')
+y<-train[,"hits"]
+
+## Root Mean Squared error
+rmse <- RMSE(pred = train_pred,obs = y) #30.53476 with 5000 
+
+test_pred <- predict(svm_model,newdata=test %>% select(-hits),type = 'response')
+
+test2 <- test %>% filter(!is.na(session_duration))
+test2$hits <- floor(test_pred)
+test2 <- test2 %>% select(row_num,hits)
+write.csv(test2,"SVM_results_full.csv")
+
+```
+
+
+### 6. Fit the prediction model using a neural network model.
+
+<br>
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+# Fit the model
+library(nnet)
+
+nnets_model <- nnet(hits ~ .,MaxNWts=5000,
+                 data=train[1:10000,]%>% select(-entry_page), size=20)
+
+#import the function from Github
+library(devtools)
+source_url('https://gist.githubusercontent.com/fawda123/7471137/raw/466c1474d0a505ff044412703516c34f1a4684a5/nnet_plot_update.r')
+ 
+#plot the model
+plot.nnet(nnets_model)
+
+
+## Predict Output 
+train_pred= predict(nnets_model,newdata = train,type = 'raw')
+
+## Root Mean Squared error
+rmse <- RMSE(pred = train_pred,obs = y) 
+
+test_pred <- predict(svm_model,newdata=test %>% select(-hits),type = 'response')
+
+test2 <- test %>% filter(!is.na(session_duration))
+test2$hits <- floor(test_pred)
+test2 <- test2 %>% select(row_num,hits)
+write.csv(test2,"SVM_results.csv")
+```

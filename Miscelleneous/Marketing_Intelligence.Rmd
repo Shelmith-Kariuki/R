@@ -1,0 +1,423 @@
+---
+title: <center><strong>Trivago Case Study</strong></center>
+subtitle: <center><strong><h2>Generate insights for Marketing Intelligence</h2></strong></center>
+author: <center><strong><h1>[Shelmith Nyagathiri Kariuki](https://github.com/Shelmith-Kariuki)</h1></strong></center>
+date: <center><strong><h2>January 24, 2020</h2></strong></center>
+output:
+  html_document:
+    code_folding: hide
+    toc: yes
+    toc_depth: '6'
+  pdf_document:
+    toc: yes
+    toc_depth: '6'
+  word_document:
+    toc: yes
+    toc_depth: '6'
+---
+<script>
+   $(document).ready(function() {
+     $head = $('#header');
+     $head.prepend('<img src=\"trivago_logo_new2.png\" style=\"float: left;width: 150px;\"/>')
+   });
+</script>
+
+<style>
+body {
+text-align: justify}
+</style>
+
+Trivago is an online company that meets the growing demand for independent travel information. It offers an extensive hotel meta search to travellers. 
+
+The following document details results from the 'Marketing Intelligence' data task. 
+
+The task involves two datasets i.e Marketing campaigns and Session data
+
+The Marketing campaigns data contains weekly information about different online marketing campaigns in one market.
+
+The Session data contains information about single visits to the trivago website (= sessions). A click out is logged whenever a user clicks on a hotel and is redirected to the booking page. The booking field is binary and indicates if a hotel booking was logged after one of the click outs.
+
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,fig.width = 12)
+
+```
+
+
+
+<br>
+```{r,warning=FALSE, message=FALSE}
+### 0.1 Install the libraries required
+## Create a vector of packages to be installed
+pkgs <- c("tidyverse","data.table","DT","lubridate","ggthemes","randomForest","readODS","ggcorrplot")
+
+## Check if there are packages you want to load, that are not already installed. 
+miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]] 
+
+## Installing the missing packages
+if(length(miss_pkgs)>0){
+  install.packages(miss_pkgs)
+}
+## Loading all the packages
+invisible(lapply(pkgs,library,character.only=TRUE))
+
+## Remove the objects that are no longer required
+rm(miss_pkgs)
+rm(pkgs)
+
+```
+
+
+<br>
+```{r,warning=FALSE, message=FALSE}
+### Setting the plot theme
+trivago_theme<- theme_hc()+ theme(legend.position = "right", 
+                 legend.direction = "vertical",
+                 #legend.title = element_blank(),
+                 plot.title = element_text( size = rel(1.6), hjust = 0.5),
+                plot.subtitle = element_text(size = rel(1.5), hjust = 0.5),
+                 #axis.text = element_text( size = rel(1.5)),
+                 axis.text.x = element_text(size =rel(1.5),angle = 0),
+                 axis.text.y = element_text(size =rel(1.5),angle = 0),
+                 axis.title = element_text( size = rel(1.55)),
+                axis.line.x = element_line(size = 1.5, colour = "#c94a38"),
+                 panel.background = element_rect(fill = NA))
+
+### Colours that will be used for the plots 
+trivago_blue = "#377DA9"
+trivago_maroon = "#BB523A"
+trivago_yellow = "#E79435"
+
+## Avoidance of scientific numbers
+options(scipen = 999)
+
+## Printing function
+pr_func<-function(data,cnames){
+datatable(data,colnames = cnames,
+  extensions = 'Buttons', options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'print')
+  )
+)
+}
+```
+
+
+<br>
+```{r,warning=FALSE,message=FALSE}
+### 0.2 Read in the datasets
+mc_df <- read_ods("marketing_campaigns2.ods")
+sessions_df <- read_ods("session_data.ods")
+```
+
+## Task 1: Marketing Campaigns
+
++ Give an overview of entire market’s development and the different campaigns. Please prepare
+3-5 charts and summarize the most important findings.
+
++ How would you assess the development of the quality of traffic, e.g. in terms of revenue per
+visitor. How is the overall development and how does each campaign evolve?
+
++ You are talking with the responsible business developer for the market who wants to spend an
+additional 250€ per week from week 31 onwards. Please help him out with the following
+questions:
++ + What is your advice in which campaign to invest and why?
+
++ + How do you expect this to impact the overall performance in the market from week 31
+onwards?
+
+
+### 1.1. Clean the dataset, and generate new variables
+<br>
+```{r,warning=FALSE,message=FALSE}
+
+## Convert the Campaign variable to factor
+
+mc_df <- mc_df %>% 
+  mutate(Campaign = fct_relevel(Campaign,"Aldebaran","Bartledan","Cottington")) 
+
+## Remove duplicates
+mc_df <- mc_df %>% 
+  unique()
+
+## Generate a profit variable
+mc_df <- mc_df %>% 
+  mutate(Profit = Revenue - Cost)
+
+## Weekly_RPV
+mc_df <- mc_df %>% 
+  mutate(Weekly_RPV = Revenue /Visits)
+
+```
+
+
+### 1.2 Exploring the trend of visits for each of the campaigns
+<br>
+
+The Aldebaran campaign seems to have done really well in terms of attracting visitors to the site, all through the campaign period. 
+
+As much as the number of visits was quite low in the beginning (as compared to the other two campaigns), and with very few dips in the number of visits here and there, there was a good increasing trend overall. 
+
+The Bartledan campaign started off at a steady rate, until week 14, where the number of visits to the site picked up a bit till the end.
+
+The Cottington campaign maintained a steady state in the number of visits all through the campaign period.
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12,fig.height=6}
+graph <- mc_df %>% 
+  ggplot(aes(x = as.factor(Week), y=Visits, group = Campaign,color = Campaign))+
+  geom_line(size = 1.1)+
+  trivago_theme+
+  scale_color_manual(values = c(trivago_maroon, trivago_yellow, trivago_blue))+
+  labs(title = "Distribution of the Number of Visits",
+       x = "Week", y="Number of Visits",color = "Campaign")
+graph
+
+```
+
+### 1.3 Revenue Per Visitor
+
+RPV is the average revenue per visitor to your website.
+Here, we are assuming that a visit represents a unique visitor. 
+RPV is calculated  by dividing the total income by the number of visitors during a specific time period.
+From the graph, we can see that as much the Cottington campaign maintained a low but steady state in the number of visits all through the campaign period, the RPV was he highest, amongst all the three campaigns. 
+This means that the low number of visitors actually generated higher revenue as opposed to the revene that was generated by the higher number of visitors on the other two campaigns.
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12,fig.height=6}
+
+graph <- mc_df %>% 
+  ggplot(aes(x = as.factor(Week), y=Weekly_RPV, group = Campaign,color = Campaign))+
+  geom_line(size = 1.1)+
+  trivago_theme+
+  scale_color_manual(values = c(trivago_maroon, trivago_yellow, trivago_blue))+
+  labs(title = "Weekly Revenue Per Visitor",
+       x = "Week", y="Revenue Per Visitor",color = "Campaign")
+graph
+```
+
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12,fig.height=6}
+
+## Generating ROMI
+RPV_df <- mc_df %>% 
+  group_by(Campaign) %>% 
+  summarise(RPV = round(sum(Revenue)/ sum(Visits),1)) 
+
+## Generate the plot
+graph <- ggplot(data = RPV_df,
+              mapping = aes(x = Campaign, y = RPV, fill = Campaign))+
+              geom_bar(stat = "identity")+
+              geom_text(aes(label = RPV),vjust = -0.25, size = 5)+
+              trivago_theme+
+              scale_fill_manual(values = c(trivago_maroon, trivago_yellow, trivago_blue))+
+              labs(title = "Overall Revenue Per Visitor",
+              x = "Campaign", y="Revenue Per Visitor",color = "Campaign")
+graph
+```
+
+### 1.4 Assessing profitability of each of the campaigns over the weeks
+<br>
+
+In terms of profitability, the Bartledan campaign was the worst performer as it never generated any profit. 
+
+The Cottington Campaign was doing well, until Week 20, when it started generating losses.
+
+Coincidentally, Week 20 is the same week that Aldebaran came out of the red, and started generating profits. 
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12,fig.height=6}
+
+graph <- mc_df %>% 
+  ggplot(aes(x = as.factor(Week), y=Profit, group = Campaign,color = Campaign))+
+  geom_line(size = 1.1)+
+  geom_hline(yintercept = 0,color="black", linetype = "dashed")+
+  geom_vline(xintercept = 20,color="red", linetype = "dashed")+
+  trivago_theme+
+  scale_color_manual(values = c(trivago_maroon, trivago_yellow, trivago_blue))+
+  labs(title = "Assessing Campaign Profitability \n (Absolute Difference)",
+       x = "Week", y="Profitability",color = "Campaign")
+graph
+
+```
+
+### 1.5 Assessing Overall Campaign Profitability
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12,fig.height=6}
+
+abs_df <- mc_df %>% 
+  select(Week, Campaign, Revenue, Cost) %>% 
+  pivot_longer(cols = Revenue:Cost, names_to ="Revenue_Cost" ,values_to = "Value") %>% 
+  group_by(Campaign,Revenue_Cost) %>% 
+  summarise(Value = round(sum(Value),1))
+
+## Generate the plot
+graph <- ggplot(data = abs_df,
+              mapping = aes(x = Campaign, y = Value, fill = Revenue_Cost))+
+              geom_bar(stat = "identity", position = "dodge")+
+            geom_text(aes(label = Value),vjust = -0.25, size = 5, position = position_dodge(width = 1))+
+              trivago_theme+
+              scale_fill_manual(values = c("#377DA9","#E79435"))+
+              labs(title = "Assessing Overall Campaign Profitability",
+              x = "Campaign", y="Revenue/Cost",color = "Measure")
+
+graph
+
+```
+
+
+
+### 1.6 Measuring Return on Marketing Investment (ROMI)
+
+ROMI is an indication of return on investment in marketing.
+
+ROMI = [Total sales - marketing campaign costs / marketing campaign costs]
+<br>
+
+There is a larger ROMI on the Cottington campaign, as compared to the Aldebaran campaign. The Bartledan resulted into a negative ROMI, even though the number of visits to the site kept on increasing, as the weeks flew by.
+
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12,fig.height=6}
+
+## Generating ROMI
+ROMI_df <- mc_df %>% 
+  group_by(Campaign) %>% 
+  summarise(ROMI_abs = (sum(Revenue)-sum(Cost)) / sum(Cost),
+            ROMI_perc = round(ROMI_abs * 100,2)) 
+
+## Generate the plot
+graph <- ggplot(data = ROMI_df,
+              mapping = aes(x = Campaign, y = ROMI_perc, fill = Campaign))+
+              geom_bar(stat = "identity")+
+              geom_text(aes(label = ROMI_perc),vjust = -0.25, size = 5)+
+              trivago_theme+
+              scale_fill_manual(values = c(trivago_maroon, trivago_yellow, trivago_blue))+
+              labs(title = "Assessing Campaign Profitability \n (ROMI)",
+              x = "Campaign", y="ROMI (%)",color = "Campaign")+
+  ylim(-15,5)
+graph
+
+```
+
+
+### 1.7 Does the type of campaign predict profit?
+
+```{r,warning=FALSE,message=FALSE,comment=NA}
+model1 <- lm(Profit ~ Campaign, data = mc_df)
+summary(model1)
+```
+
+Trivago is likely to obtain a significant profit of 11.2 for an additional investment on the Cottington campaign, as opposed to the investment being made on the Aldebaran campaign.
+
+Trivago would make a huge loss (27.6) if it invested cash on the Bartledan campaign.
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12,fig.height=6}
+
+## Generating a tidy table
+model1_tidy <- broom::tidy(model1)
+basevalues <- c("CampaignAldebaran",0,	5.204708,	0,	0)
+model1_tidy <- rbind(model1_tidy,basevalues)
+model1_tidy$term <- gsub("Campaign","",model1_tidy$term)
+model1_tidy <- model1_tidy%>% filter(term !="(Intercept)")
+model1_tidy <- model1_tidy%>% mutate(estimate = round(as.numeric(estimate),1))
+model1_tidy <- model1_tidy%>% rename(Campaign = term)
+#model1_tidy$estimate <- round(model1_tidy$estimate)
+
+## Generate the plot
+graph <- ggplot(data = model1_tidy,
+              mapping = aes(x = Campaign, y = estimate, fill = Campaign))+
+              geom_bar(stat = "identity")+
+              geom_text(aes(label = estimate),vjust = -0.25, size = 5)+
+              trivago_theme+
+              scale_fill_manual(values = c(trivago_maroon, trivago_yellow, trivago_blue))+
+              labs(title = "Campaign regressed on Profit",
+              x = "Campaign", y="Regression Estimate",color = "Campaign")+
+  ylim(-30,13)
+graph
+
+```
+
+### 1.8 Does the type of campaign predict number of visits?
+
+```{r,warning=FALSE,message=FALSE,comment=NA}
+model2 <- lm(Visits ~ Campaign, data = mc_df)
+summary(model2)
+```
+
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12,fig.height=6}
+
+## Generating a tidy table
+model2_tidy <- broom::tidy(model2)
+basevalues <- c("CampaignAldebaran",0,	5.204708,	0,	0)
+model2_tidy <- rbind(model2_tidy,basevalues)
+model2_tidy$term <- gsub("Campaign","",model2_tidy$term)
+model2_tidy <- model2_tidy%>% filter(term !="(Intercept)")
+model2_tidy <- model2_tidy%>% mutate(estimate = round(as.numeric(estimate),1))
+model2_tidy <- model2_tidy%>% rename(Campaign = term)
+#model2_tidy$estimate <- round(model2_tidy$estimate)
+
+## Generate the plot
+graph <- ggplot(data = model2_tidy,
+              mapping = aes(x = Campaign, y = estimate, fill = Campaign))+
+              geom_bar(stat = "identity")+
+              geom_text(aes(label = estimate),vjust = -0.25, size = 5)+
+              trivago_theme+
+              scale_fill_manual(values = c(trivago_maroon, trivago_yellow, trivago_blue))+
+              labs(title = "Campaign regressed on Number of Visits",
+              x = "Campaign", y="Regression Estimate",color = "Campaign")
+graph
+
+```
+
+
+## Task 2: Session data
+
+Test to see if there are any connections between the booking data and any other given information.
+
+### 2.1 Create additional variables
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12,fig.height=5}
+## Session duration
+
+sessions_df <- sessions_df%>% 
+  mutate(duration = difftime(session_end_text, session_start_text, units = "secs",tz = "EAT"),
+         duration = ifelse(duration <0, (24*60*60)+duration, duration))
+
+## Start hour 
+sessions_df <- sessions_df%>% 
+  mutate(start_hour = hour(session_start_text)) 
+
+
+## Start time
+
+```
+
+### 2.2 Assess the correlation between the variables
+
+There is no correlation between the 'booking variable' and any othe variables. Meaning none of the variables can predict booking. 
+<br>
+```{r,warning=FALSE,message=FALSE,comment=NA}
+## Generate the correlation matrix
+corr_mat <- cor(sessions_df %>% select(booking, clickouts, duration, start_hour))
+corr_mat
+```
+
+<br>
+```{r,warning=FALSE,message=FALSE,comment=NA}
+
+## Generate the p-values of this correlation matrix
+p.mat <- cor_pmat(corr_mat)
+p.mat
+```
+
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12,fig.height=5}
+## Generate the correlation plot.
+ggcorrplot(corr_mat,
+   outline.col = "white",lab = TRUE,
+   ggtheme = trivago_theme,
+   colors = c(trivago_maroon, trivago_yellow, trivago_blue),
+   title = "Correlation Plot")
+
+```
+
+
