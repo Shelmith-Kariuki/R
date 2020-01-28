@@ -62,3 +62,4 @@ pivot_longer(names_to = "New variable name to contain the columns to be collapse
 spread("The variable whose values will form the new columns","The current variable containing the values that will be the data points of the new columns") 
 pivot_wider(names_from = "The variable whose values will form the new columns",values_from ="The current variable containing the values that will be the data points of the new columns") 
 
+  
