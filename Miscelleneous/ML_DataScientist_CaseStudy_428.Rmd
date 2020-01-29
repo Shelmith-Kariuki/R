@@ -1,0 +1,856 @@
+---
+title: <center><strong>Trivago Case Study</strong></center>
+subtitle: <center><strong><h2>Challenge 428 - Building a predictive 'hits' model:Part 1</h2></strong></center>
+author: <center><strong><h1>[Shelmith Nyagathiri Kariuki](https://github.com/Shelmith-Kariuki)</h1></strong></center>
+date: <center><strong><h2>January 20, 2020</h2></strong></center>
+output:
+  html_document:
+    toc: yes
+    toc_depth: '6'
+    code_folding: hide
+---
+Trivago is an online company that meets the growing demand for independent travel information. It offers an extensive hotel meta search to travellers. 
+
+Trivago hosts different case studies on their website, that job applicants can work on.
+
+Details about this particular can be found can be found [here](https://jobs.zealpath.com/m/case/detail/428). 
+
+The variables of the dataset are defined below:
+
++ row_num: a number uniquely identifying each row.
+
++ locale: the platform of the session.
+
++ day_of_week: Mon-Fri, the day of the week of the session.
+
++ hour_of_day: 00-23, the hour of the day of the session.
+
++ agent_id: the device used for the session.
+
++ entry_page: describes the landing page of the session.
+
++ path_id_set: shows all the locations that were visited during the session.
+
++ traffic_type: indicates the channel the user cane through eg. search engine, email, ...
+
++ session_duration: the duration in seconds of the session.
+
++ hits: the number of interactions with the trivago page during the session.
+
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,fig.width = 12)
+
+```
+
+### 0. Install the libraries required
+<br>
+```{r,warning=FALSE, message=FALSE}
+
+## create a vector of packages to be installed
+pkgs <- c("tidyverse","data.table","DT","lubridate","ggthemes",
+          "randomForest","e1071","rpart","pROC","caret")
+
+## Check if there are packages you want to load, that are not already installed. 
+miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]] 
+
+## Installing the missing packages
+if(length(miss_pkgs)>0){
+  install.packages(miss_pkgs)
+}
+## Loading all the packages
+invisible(lapply(pkgs,library,character.only=TRUE))
+
+## Remove the objects that are no longer required
+rm(miss_pkgs)
+rm(pkgs)
+
+```
+
+
+<br>
+```{r,warning=FALSE, message=FALSE}
+### Setting the plot theme
+trivago_theme<- theme_hc()+ theme(legend.position = "right", 
+                 legend.direction = "vertical",
+                 legend.title = element_blank(),
+                 plot.title = element_text( size = rel(1.6), hjust = 0.5),
+                plot.subtitle = element_text(size = rel(1.5), hjust = 0.5),
+                 #axis.text = element_text( size = rel(1.5)),
+                 axis.text.x = element_text(size =rel(1.5),angle = 0),
+                 axis.text.y = element_text(size =rel(1.5),angle = 0),
+                 axis.title = element_text( size = rel(1.55)),
+                axis.line.x = element_line(size = 1.5, colour = "#c94a38"),
+                 panel.background = element_rect(fill = NA))
+
+### Colours that will be used for the plots 
+trivago_blue = "#377DA9"
+trivago_maroon = "#BB523A"
+trivago_yellow = "#E79435"
+
+
+## Avoidance of scientific numbers
+options(scipen = 999)
+
+## Printing function
+pr_func<-function(data,cnames){
+datatable(data,colnames = cnames,
+  extensions = 'Buttons', options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'print')
+  )
+)
+}
+```
+
+### 1. Read in the datasets
+<br>
+```{r,warning=FALSE,message=FALSE}
+
+hits_df <- read_csv("ML Data Scientist Case Study Data.csv")
+
+
+```
+
+### 2. Clean the variables a bit
+<br>
+```{r,warning=FALSE,message=FALSE}
+
+## Separate the data intodifferent variables
+hits_df <- hits_df %>%
+  separate(`row_num;locale;day_of_week;hour_of_day;agent_id;entry_page;path_id_set;traffic_type;session_durantion;hits`,into = c("A","B","C"),sep = '\\"')
+
+hits_df <- hits_df %>%
+  separate(A,into = c("row_num","locale","day_of_week","hour_of_day","agent_id","entry_page","path_id_set","traffic_type","session_duration","hits"),remove = T)
+
+## Clean up the path_id_set
+hits_df <- hits_df %>% 
+  mutate(path_id_set = ifelse(path_id_set == "",B,path_id_set)) %>% 
+  select(-B)
+
+  
+
+hits_df <- hits_df %>%
+  separate(C,into = c("D","A","B","C2"),sep = ';')
+
+## Clean up traffic_type
+hits_df$traffic_type <- ifelse(is.na(hits_df$traffic_type),hits_df$A,hits_df$traffic_type)
+
+## Clean up session_duration
+
+hits_df$session_duration <- ifelse(is.na(hits_df$session_duration),hits_df$B,hits_df$session_duration)
+
+## Clean up hits
+hits_df$hits <- ifelse(is.na(hits_df$hits),hits_df$C2,hits_df$hits)
+hits_df <- hits_df %>% select(-D:-C2)
+hits_df <- hits_df %>% mutate(mashida = ifelse(is.na(hits),1,0))
+hits_df <- hits_df %>% 
+  mutate(hits = ifelse(mashida==1,session_duration, hits),
+        session_duration = ifelse(mashida==1,traffic_type, session_duration),
+        traffic_type = ifelse(mashida==1,path_id_set, traffic_type),
+        path_id_set = ifelse(mashida==1,0, path_id_set))
+hits_df$hits <- ifelse(hits_df$hits %in% grep("N",hits_df$hits,value = T, ignore.case = T),NA,hits_df$hits)
+
+## Clean up session_duration
+
+hits_df$session_duration <- ifelse(hits_df$session_duration %in% grep("N",hits_df$session_duration,value = T, ignore.case = T),NA,hits_df$session_duration)
+
+## Convert hits and session duration to actual numerics
+
+hits_df$hits <- as.numeric(hits_df$hits)
+hits_df$session_duration <- as.numeric(hits_df$session_duration)
+hits_df$mashida <- NULL
+
+## Convert the data into a proper datafame
+hits_df <- data.frame(hits_df)
+
+```
+
+
+###3. Carry out some feature engineering.
+
+We are going to create other ariables, based on the ones we have, which may be better predictors of the number of hits.
+
+#### 3.1 Generate two variables, one showing whether the day is a weekday or not, another showing whether the day is at the beginning or at the end of the week.
+
+##### 3.1.1 Day of Week variable
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis'}
+## First factor the current weekday variable
+
+hits_df <- hits_df %>% 
+  mutate(day_of_week = fct_relevel(day_of_week,"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"))
+
+## Plot the mean number of hits for each of the categories in the three variables.
+
+summ_tab <- hits_df %>% 
+  dplyr::group_by(day_of_week) %>% 
+  summarise(avg_hits = round(mean(hits, na.rm = TRUE),2)) 
+
+## Print the table
+
+pr_func(summ_tab,cnames = c("Day of the week","Average No. of Hits") )
+
+
+## Graph
+summ_graph <- ggplot(summ_tab ,aes(x=day_of_week,y=avg_hits,group = 1))+
+              geom_line(stat = "identity",color = trivago_yellow)+
+              geom_text(aes(label = avg_hits),vjust = -0.25, size = 5)+
+              trivago_theme+
+              labs(title = "Average Number of Hits Per Session",x="Day of Week",
+                   y="Average Number of Hits")
+summ_graph
+
+
+```
+
+##### 3.1.2 Weekend variable
+<br>
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+
+## Generate the weekend variable
+hits_df <- hits_df %>% 
+  mutate(weekend = ifelse(day_of_week=="Sunday"|day_of_week=="Saturday","Weekend","Weekday"),
+         weekend = fct_relevel(weekend,"Weekday","Weekend"))
+
+## Plot the mean number of hits for each of the categories in the three variables.
+
+summ_tab <- hits_df %>% 
+  dplyr::group_by(weekend) %>% 
+  summarise(avg_hits = round(mean(hits, na.rm = TRUE),2)) 
+
+## Print the table
+
+pr_func(summ_tab,cnames = c("Weekend","Average No. of Hits"))
+
+
+## Graph
+summ_graph <- ggplot(summ_tab ,aes(x=weekend,y=avg_hits))+
+              geom_bar(stat = "identity",fill = trivago_yellow)+
+              geom_text(aes(label = avg_hits),vjust = -0.25, size = 5)+
+              trivago_theme+
+              labs(title = "Average Number of Hits Per Session",x="",
+                   y="Average Number of Hits")+
+  ylim(c(0,20))
+summ_graph
+
+```
+
+##### 3.1.3 Week Position variable
+<br>
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+
+## Generate the week_pos variable that indicates whether the day is at the beginning or at the end of the week.
+hits_df <- hits_df %>% 
+  mutate(week_pos = ifelse(day_of_week=="Sunday"|day_of_week=="Monday"|day_of_week=="Tuesday"|day_of_week=="Wednesday","Beginning","End"),
+         week_pos = fct_relevel(week_pos,"Beginning","End"))
+
+## Plot the mean number of hits for each of the categories in the three variables.
+
+summ_tab <- hits_df %>% 
+  dplyr::group_by(week_pos) %>% 
+  summarise(avg_hits = round(mean(hits, na.rm = TRUE),2)) 
+
+## Print the table
+
+pr_func(summ_tab,cnames = c("week_pos","Average No. of Hits") )
+
+
+
+## Graph
+summ_graph <- ggplot(summ_tab ,aes(x=week_pos,y=avg_hits))+
+              geom_bar(stat = "identity",fill = trivago_yellow)+
+              geom_text(aes(label = avg_hits),vjust = -0.25, size = 5)+
+              trivago_theme+
+              labs(title = "Average Number of Hits Per Session",x="",
+                   y="Average Number of Hits")+
+  ylim(c(0,20))
+summ_graph
+
+```
+
+
+##### 3.1.4 Check if there is a relationship between these variables and the number of hits
+<br>
+```{r,warning=FALSE,message=FALSE,comment=NA}
+
+summary(aov(hits~day_of_week, data = hits_df))
+summary(aov(hits~weekend, data = hits_df))
+summary(aov(hits~week_pos, data = hits_df))
+```
+
+#### 3.2 Hour of day
+
+##### 3.2.1 Continous variable
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+
+## Plot the mean number of hits per hour.
+
+summ_tab <- hits_df %>% 
+  mutate(hour_of_day = as.numeric(hour_of_day)) %>% 
+  group_by(hour_of_day ) %>% 
+  summarise(avg_hits = round(mean(hits, na.rm = TRUE),2)) 
+
+
+## Graph
+summ_graph <- ggplot(summ_tab ,aes(x=as.factor(hour_of_day),y=avg_hits,group = 1))+
+              geom_line(stat = "identity",color = trivago_yellow)+
+              geom_text(aes(label = avg_hits),vjust = -0.25, size = 4.5)+
+              trivago_theme+
+              labs(title = "Average Number of Hits Per Session",x="Hour",
+                   y="Average Number of Hits")
+summ_graph
+
+
+
+```
+
+##### 3.2.2 Re-bucket the variable into categories
+
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+
+hits_df <- hits_df %>% 
+  mutate(hour_of_day = as.numeric(hour_of_day)) %>% 
+  mutate(hour_of_day2 = ifelse(hour_of_day >=0 & hour_of_day <=5,"Early Morning",
+                        ifelse(hour_of_day >=6 & hour_of_day <=11,"Morning",
+                        ifelse(hour_of_day >=12 & hour_of_day <=18,"Afternoon",
+                        ifelse(hour_of_day >=19 & hour_of_day <=23,"Evening","")))))
+
+hits_df <- hits_df %>% 
+  mutate(hour_of_day2 = fct_relevel(hour_of_day2, "Early Morning","Morning","Afternoon","Evening")) 
+
+## Generate a summary table
+summ_tab <- hits_df %>% 
+  dplyr::group_by(hour_of_day2) %>% 
+  summarise(avg_hits = round(mean(hits, na.rm = TRUE),2)) 
+
+## Print the table
+
+pr_func(summ_tab,cnames = c("Time of Day","Average No. of Hits") )
+
+
+
+## Graph
+
+summ_graph <- ggplot(summ_tab ,aes(x=as.factor(hour_of_day2),y=avg_hits,group = 1))+
+              geom_line(stat = "identity",color = trivago_yellow)+
+              geom_text(aes(label = avg_hits),vjust = -0.25, size = 5)+
+              trivago_theme+
+              labs(title = "Average Number of Hits Per Session",x="Time of Day",
+                   y="Average Number of Hits")
+summ_graph
+
+## Generate a summary table by hour of day and day of week
+summ_tab <- hits_df %>% 
+  dplyr::group_by(hour_of_day2,day_of_week) %>% 
+  summarise(avg_hits = round(mean(hits, na.rm = TRUE),2)) 
+
+## Print the table
+
+pr_func(summ_tab,cnames = c("Time of Day","Day of Week", "Average No. of Hits") )
+
+
+
+## Graph
+
+summ_graph <- ggplot(summ_tab ,aes(x=day_of_week,y=avg_hits,group = as.factor(hour_of_day2),color=as.factor(hour_of_day2)))+
+              geom_line(stat = "identity")+
+              geom_text(aes(label = avg_hits),vjust = -0.25, size = 4,color = "black")+
+              trivago_theme+
+  scale_color_brewer(palette = "Spectral")+
+              labs(title = "Average Number of Hits Per Session",x="Day of Week",
+                   y="Average Number of Hits")
+summ_graph
+
+## Generate a summary table by hour of day and time of day
+summ_tab <- hits_df %>% 
+  dplyr::group_by(hour_of_day2,weekend) %>% 
+  summarise(avg_hits = round(mean(hits, na.rm = TRUE),2)) 
+
+## Print the table
+
+pr_func(summ_tab,cnames = c("Time of Day","Weekend", "Average No. of Hits") )
+
+
+
+## Graph
+
+summ_graph <- ggplot(summ_tab ,aes(x=as.factor(hour_of_day2),y=avg_hits,group = weekend,color=weekend))+
+              geom_line(stat = "identity")+
+              geom_text(aes(label = avg_hits),vjust = -0.25, size = 4,color = "black")+
+              trivago_theme+
+              scale_color_manual(values = c(trivago_blue, trivago_yellow))+
+              labs(title = "Average Number of Hits Per Session",x="Time of Day",
+                   y="Average Number of Hits")
+summ_graph
+
+```
+
+##### 3.2.3 Testing if there is a correlation between hour of the day and the number of hits
+<br>
+
+```{r,warning=FALSE,message=FALSE,comment=NA}
+
+cor.test(hits_df$hour_of_day, hits_df$hits) ## As the day progresses, the number of hits significantly decreases.
+
+
+
+```
+
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+## Graph
+
+summ_graph <- ggplot(hits_df ,aes(x=as.factor(hour_of_day),y=hits))+
+              geom_point(color = trivago_yellow)+
+              geom_smooth()+
+              trivago_theme+
+              #theme(axis.text.x = element_text(angle=45))+
+              labs(title = "Number of Hits \n by\n Hour",x="Hour of Day",
+                   y="Number of Hits")
+summ_graph
+
+
+summ_graph <- ggplot(hits_df ,aes(x=hits))+
+              geom_area(stat = "bin",fill = trivago_yellow)+
+              trivago_theme+
+              #theme(axis.text.x = element_text(angle=45))+
+              labs(title = "Distribution of Number of Hits",x="Number of Hits",
+                   y="Frequency")+xlim(c(0,50))
+summ_graph
+
+```
+
+#### 3.3 Path_id_set
+
+##### 3.3.1 Number of pages visited
+<br>
+
+```{r,warning=FALSE,message=FALSE,comment=NA}
+loc <- hits_df%>% 
+  select(row_num,path_id_set) %>% 
+  separate_rows(path_id_set,sep = ";") %>% 
+  mutate(path_id_set = as.numeric(path_id_set)) %>% 
+  group_by(row_num) %>% 
+  mutate(counter = seq_along(path_id_set)) %>% 
+  mutate(path_first0 = ifelse(path_id_set == 0 & counter == 1, "Yes","No"),
+         path_first0 = ifelse(any(path_first0=="Yes"),"Yes","No"))
+  
+
+
+num_locs <- loc%>% 
+  group_by(row_num) %>% 
+  count() %>% 
+  rename(num_locs = n)
+
+first0 <- loc %>% 
+  distinct(row_num,path_first0)
+
+hits_df2 <-Reduce(function(x,y) merge(x,y) ,list(hits_df,num_locs,first0))
+
+hits_df2 <- hits_df2 %>% 
+  mutate(path_first0 = fct_relevel(path_first0,"No","Yes"))
+
+rm(hits_df)
+rm(loc)
+rm(first0)
+rm(num_locs)
+
+summ_tab <- hits_df2 %>% 
+  dplyr::group_by(num_locs) %>% 
+  summarise(avg_hits = round(mean(hits, na.rm = TRUE),2)) 
+
+## Print the table
+
+pr_func(summ_tab,cnames = c("Number of pages visited","Average No. of Hits") )
+
+
+
+## Graph
+
+summ_graph <- ggplot(summ_tab ,aes(x=num_locs,y=avg_hits,group = 1))+
+              geom_line(stat = "identity",color = trivago_yellow)+
+              #geom_text(aes(label = avg_hits),vjust = -0.25, size = 4)+
+              trivago_theme+
+              labs(title = "Average Number of Hits Per Session",x="Number of pages visited",
+                   y="Average Number of Hits")+ xlim(c(0,20))
+summ_graph
+
+```
+
+
+##### 3.3.2 First page visited being 0
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+
+summ_tab <- hits_df2 %>% 
+  dplyr::group_by(path_first0) %>% 
+  summarise(avg_hits = round(mean(hits, na.rm = TRUE),2)) 
+
+## Print the table
+
+pr_func(summ_tab,cnames = c("path_first0","Average No. of Hits") )
+
+
+
+## Graph
+
+summ_graph <- ggplot(summ_tab ,aes(x=as.factor(path_first0),y=avg_hits))+
+              geom_bar(stat = "identity",fill = trivago_yellow)+
+              geom_text(aes(label = avg_hits),vjust = -0.25, size = 5)+
+              trivago_theme+
+              labs(title = "Average Number of Hits Per Session",x="path_first0",
+                   y="Average Number of Hits")
+summ_graph
+
+```
+
+
+
+
+##### 3.3.3 Testing relationships between the two new variables and the hits variable
+
+<br>
+```{r,warning=FALSE,message=FALSE,comment=NA}
+
+cor.test(hits_df2$num_locs, hits_df2$hits) ## Strong positive correlation. The higher the number of pages visited, the higher the higher the number of hits
+
+summary(aov(hits~path_first0, data = hits_df2)) ## The number of hits is significantly higher for those whose first page is 0. 
+
+```
+
+#### 3.4 Locale
+
+<br>
+```{r,warning=FALSE,message=FALSE,comment=NA}
+
+hits_df2 <- hits_df2 %>% 
+  mutate(locale = fct_relevel(locale,"L1","L2","L3","L4","L5","L6"))
+
+summary(aov(hits~locale, data = hits_df2))
+
+```
+
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+
+summ_tab <- hits_df2 %>% 
+  dplyr::group_by(locale) %>% 
+  summarise(avg_hits = round(mean(hits, na.rm = TRUE),2)) 
+
+## Print the table
+
+pr_func(summ_tab,cnames = c("locale","Average No. of Hits") )
+
+
+
+## Graph
+
+summ_graph <- ggplot(summ_tab ,aes(x=as.factor(locale),y=avg_hits))+
+              geom_bar(stat = "identity",fill = trivago_yellow)+
+              geom_text(aes(label = avg_hits),vjust = -0.25, size = 5)+
+              trivago_theme+
+              labs(title = "Average Number of Hits Per Session",x="Platform",
+                   y="Average Number of Hits")
+summ_graph
+
+
+
+
+```
+
+
+#### 3.5 Agent ID
+
+<br>
+```{r,warning=FALSE,message=FALSE,comment=NA}
+hits_df2 <- hits_df2 %>% 
+  mutate(agent_id = as.factor(as.numeric(agent_id)))
+
+summary(aov(hits~agent_id, data = hits_df2))
+```
+
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+
+summ_tab <- hits_df2 %>% 
+  dplyr::group_by(agent_id) %>% 
+  summarise(avg_hits = round(mean(hits, na.rm = TRUE),2)) 
+
+## Print the table
+
+pr_func(summ_tab,cnames = c("agent_id","Average No. of Hits") )
+
+
+
+## Graph
+
+summ_graph <- ggplot(summ_tab ,aes(x=as.factor(agent_id),y=avg_hits))+
+              geom_bar(stat = "identity",fill = trivago_yellow)+
+              geom_text(aes(label = avg_hits),vjust = -0.25, size = 5)+
+              trivago_theme+
+              labs(title = "Average Number of Hits Per Session",x="Agent ID",
+                   y="Average Number of Hits")
+summ_graph
+```
+
+#### 3.6 Entry Page
+
+<br>
+```{r,warning=FALSE,message=FALSE,comment=NA}
+
+hits_df2 <- hits_df2 %>% 
+  mutate(entry_page = as.factor(as.numeric(entry_page)))
+
+summary(aov(hits~entry_page, data = hits_df2))
+
+```
+
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+
+summ_tab <- hits_df2 %>% 
+  dplyr::group_by(entry_page) %>% 
+  summarise(avg_hits = round(mean(hits, na.rm = TRUE),2)) %>% 
+  arrange(desc(avg_hits)) %>% 
+  top_n(7)
+
+## Print the table
+
+pr_func(summ_tab,cnames = c("Entry Page","Average No. of Hits"))
+
+## Graph
+
+summ_graph <- ggplot(summ_tab ,aes(x=as.factor(entry_page),y=avg_hits))+
+              geom_bar(stat = "identity",fill = trivago_yellow)+
+              geom_text(aes(label = avg_hits),vjust = -0.25, size = 5)+
+              trivago_theme+
+              labs(title = "Average Number of Hits Per Session",x="Entry Page",
+                   y="Average Number of Hits")
+summ_graph
+
+```
+
+
+#### 3.7 Traffic Type
+
+<br>
+```{r,warning=FALSE,message=FALSE,comment=NA}
+
+hits_df2 <- hits_df2 %>% 
+  mutate(traffic_type = fct_relevel(traffic_type,"1","2","3","4","6","7","10"))
+
+summary(aov(hits~traffic_type, data = hits_df2))
+
+```
+
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+
+summ_tab <- hits_df2 %>% 
+  dplyr::group_by(traffic_type) %>% 
+  summarise(avg_hits = round(mean(hits, na.rm = TRUE),2)) 
+
+## Print the table
+
+pr_func(summ_tab,cnames = c("Traffic Type","Average No. of Hits") )
+
+
+
+## Graph
+
+summ_graph <- ggplot(summ_tab ,aes(x=as.factor(traffic_type),y=avg_hits))+
+              geom_bar(stat = "identity",fill = trivago_yellow)+
+              geom_text(aes(label = avg_hits),vjust = -0.25, size = 5)+
+              trivago_theme+
+              labs(title = "Average Number of Hits Per Session",x="Traffic Type",
+                   y="Average Number of Hits")
+summ_graph
+
+```
+
+#### 3.8 Session Duration
+<br>
+```{r,warning=FALSE,message=FALSE,comment=NA}
+
+hits_df2 <- hits_df2 %>% 
+  mutate(session_duration = as.numeric(session_duration)) 
+
+cor.test(hits_df2$session_duration, hits_df2$hits)# There is a strong positive correlation between  session duration and number of hits 
+```
+
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+## Graph
+
+summ_graph <- ggplot(hits_df2 ,aes(x=session_duration,y=hits))+
+              geom_point(color = trivago_yellow)+
+              geom_smooth()+
+              trivago_theme+
+              labs(title = "Number of Hits \n by\n Session Duration",x="Session Duration",
+                   y="Number of Hits")+
+              xlim(c(0,200))+ylim(c(0,50))
+summ_graph
+
+```
+
+### Save the data at this point, in order to fit the predictive models in a new session
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+saveRDS(hits_df2,"ML Data Scientist Case Study Data_Clean.rds")
+
+```
+
+
+### 4. Run an outliers test to drop outliers in the session duration variable 
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+## Create a box plot to identify outliers.
+
+boxplot_graph <- ggplot(hits_df ,aes(y=hits))+
+              geom_boxplot(color = trivago_yellow,outlier.colour = trivago_blue)+
+              trivago_theme+
+              labs(title = "Distribution of Hits (with outliers)",
+                   y="Hits")
+boxplot_graph
+
+outliers <- boxplot(hits_df$hits, plot=FALSE)$out
+
+
+boxplot_graph <- ggplot(hits_df %>% filter(hits < min(outliers)) ,aes(y=hits))+
+              geom_boxplot(color = trivago_yellow,outlier.colour = trivago_blue)+
+              trivago_theme+
+              labs(title = "Distribution of Hits (without outliers)",
+                   y="Hits")
+boxplot_graph
+
+
+
+hits_df <- hits_df %>% 
+  filter(!session_duration %in% outliers)
+
+rm(boxplot_graph)
+```
+
+
+### 5. Select the variables to be used in fitting the predictive model
+
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+
+reg_df <- hits_df %>% 
+  select(row_num,locale,agent_id, entry_page,weekend,week_pos,hour_of_day2,num_locs,path_first0,  traffic_type, session_duration,hits)
+
+```
+
+### 6. Split the data into train and test. The test data will be the one with missing values in the hits variable.
+
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+
+train <- reg_df %>% filter(!is.na(hits))
+train<-train[complete.cases(train),]
+# train <- train[1:(nrow(train)/10),]
+
+test <- reg_df %>% filter(is.na(hits))
+# test <- test[1:(nrow(test)/10),]
+```
+
+### 7. Fit a Random Forest model to identify the variables that are highly important in predicting the number of hits.
+<br>
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+# rm(hits_df2)
+# rm(reg_df)
+# Fitting model
+forest <- randomForest(hits ~ ., data=train%>% select(-row_num,-entry_page),ntree=500)
+varImpPlot(forest,main = "Variable Importance in predicting number of hits")
+
+## Importance of variables
+## More useful variables achieve higher increases in node purities
+importance_dat = data.frame(forest$importance)
+importance_dat$variables <- row.names(importance_dat)
+importance_dat <-importance_dat %>%select(variables, IncNodePurity)
+importance_dat = arrange(importance_dat,desc(IncNodePurity))
+
+#Predict Output 
+train_pred= predict(forest,newdata = train,type = 'response')
+
+## Root Mean Squared error
+rmse <- RMSE(pred = train_pred,obs = train$hits)
+
+
+
+test_pred <- predict(forest,newdata=test %>% select(-hits),type = 'response')
+
+test2 <- test 
+test2$hits <- floor(test_pred)
+test2 <- test2 %>% select(row_num,hits)
+write.csv(test2,"RandomForest_results_full.csv")
+```
+
+### 8. Fit the prediction model using an SVM model.
+<br>
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+# Fit the model
+svm_model <- svm(hits ~ .,
+                 data=train%>% select(-row_num,-entry_page),
+                 kernel = "radial",
+                 type = "nu-regression")
+svm_model
+
+## Predict Output 
+train_pred= predict(svm_model,newdata=train ,type = 'response')
+y<-train[,"hits"]
+
+## Root Mean Squared error
+rmse <- RMSE(pred = train_pred,obs = y) #30.53476 with 5000 
+
+test_pred <- predict(svm_model,newdata=test %>% select(-hits),type = 'response')
+
+test2 <- test %>% filter(!is.na(session_duration))
+test2$hits <- floor(test_pred)
+test2 <- test2 %>% select(row_num,hits)
+write.csv(test2,"SVM_results_full.csv")
+
+```
+
+
+### 9. Fit the prediction model using a neural network model.
+
+<br>
+
+```{r,warning=FALSE,message=FALSE,results='asis',fig.width=12}
+# Fit the model
+library(nnet)
+
+nnets_model <- nnet(hits ~ .,MaxNWts=5000,
+                 data=train[1:10000,]%>% select(-entry_page), size=20)
+
+#import the function from Github
+library(devtools)
+source_url('https://gist.githubusercontent.com/fawda123/7471137/raw/466c1474d0a505ff044412703516c34f1a4684a5/nnet_plot_update.r')
+ 
+#plot the model
+plot.nnet(nnets_model)
+
+
+## Predict Output 
+train_pred= predict(nnets_model,newdata = train,type = 'raw')
+
+## Root Mean Squared error
+rmse <- RMSE(pred = train_pred,obs = y) 
+
+test_pred <- predict(svm_model,newdata=test %>% select(-hits),type = 'response')
+
+test2 <- test %>% filter(!is.na(session_duration))
+test2$hits <- floor(test_pred)
+test2 <- test2 %>% select(row_num,hits)
+write.csv(test2,"SVM_results.csv")
+```
+
