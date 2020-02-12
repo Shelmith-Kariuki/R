@@ -29,7 +29,7 @@ df <- wafanyikazi
 freq_func <- function(dataframe, var){
   
   tab <- dataframe %>% 
-    group_by(!!as.symbol(var)) %>% 
+    group_by(!!sym(var)) %>% 
     count(name = "Frequency")
 }
 
