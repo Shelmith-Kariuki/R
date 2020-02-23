@@ -19,7 +19,7 @@ Tidyverse is a collection of R packages designed for data science. The packages 
 
 + lubridate: Used for working with dates
 
-+ tibble: Creates siple dataframes.
++ tibble: Creates simple dataframes.
 
 + stringr: Used for manipulating strings.
 
@@ -37,6 +37,27 @@ library(tidyverse)
 library(rChambua)## Contains the dataset that we will use in this script (Wafanyikazi dataset)
 ```
 
+<br>
+```{r,warning=FALSE, message=FALSE}
+### 0.1 Install the libraries required
+## Create a vector of packages to be installed
+pkgs <- c("tidyverse","data.table","DT","lubridate","ggthemes","randomForest","readODS","ggcorrplot")
+
+## Check if there are packages you want to load, that are not already installed. 
+miss_pkgs <- pkgs[!pkgs %in% installed.packages()[,1]] 
+
+## Installing the missing packages
+if(length(miss_pkgs)>0){
+  install.packages(miss_pkgs)
+}
+## Loading all the packages
+invisible(lapply(pkgs,library,character.only=TRUE))
+
+## Remove the objects that are no longer required
+rm(miss_pkgs)
+rm(pkgs)
+
+```
 
 
 ## Read in the wafanyikazi dataset
@@ -44,6 +65,8 @@ library(rChambua)## Contains the dataset that we will use in this script (Wafany
 ```{r ,warning=FALSE, message=FALSE}
 
 df <- wafanyikazi
+
+#df <- read_csv("")
 ```
 
 ##1. dplyr
@@ -69,7 +92,7 @@ df1 <- df %>%
 ## Picking or dropping variables acording to a given pattern.
 
 df1 <- df %>% 
-  select(contains("e")) ## Picking variables that contains letter e.
+  select(contains("f")) ## Picking variables that contains letter e.
 
 df1 <- df %>% 
   select(-ends_with("t"))
@@ -80,6 +103,7 @@ df1 <- df %>%
   select(Sid:Marital_Status)
 
 rm(df1)
+
 ```
 
 
@@ -87,7 +111,7 @@ rm(df1)
 
 Used for picking values. 
 
-filter works with mathematical opperations.
+filter works with mathematical operators.
 
 == equality
 != non-equality
@@ -97,7 +121,7 @@ filter works with mathematical opperations.
 | or
 
 
-In english grammar, filter means removing unwanted material. But in R, we mostly use filter to keep observations, depending on the mathematical operations used.
+In english grammar, filter means removing unwanted material. But in R, we mostly use filter to keep observations, depending on the mathematical operators used.
 
 <br>
 ```{r ,warning=FALSE, message=FALSE}
@@ -112,13 +136,19 @@ df2 <- df %>%
 df2 <- df %>% 
   filter(Age >= 25 & Age <40) ## notice the number is not enclosed in quotes
 
+df2 <- df %>% 
+  filter(Age > 30 & Gender == "Female")
 
 ## Dropping obsevations based on the condition of a character/factor variable. 
 ### Let us drop all males
 df2 <- df %>% 
   filter(Gender == "Female")
 
+df2 <- df %>% 
+  filter(Gender != "Male")
+
 rm(df2)
+
 ```
 
 
@@ -325,7 +355,7 @@ rstudio_blue <- "#4AA4DE"
 ## First come up with the table showing frequencies and percentages.
 
 tab <- df %>% 
-  group_by(Department, County, Marital_Status) %>% 
+  group_by(Department) %>% 
   count() %>% 
   rename(Count = n) %>% 
   ungroup() %>% 

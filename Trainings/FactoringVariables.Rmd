@@ -5,11 +5,11 @@ date: <strong><center>1/15/2020</strong></center>
 output: html_document
 ---
 
-There are 5 ways (that I know of) in which we can factor variables in R.
+There are 5 ways (that I know of) in which we can factorise multiple  variables in R.
 
 + One by one (an option for beginners).
 + Using a for loop.
-+ sapply()
++ lapply()
 + forcats::fct_relevel()
 + purrr::map()
 
@@ -36,9 +36,6 @@ invisible(lapply(pkgs,library,character.only=TRUE))
 rm(miss_pkgs)
 rm(pkgs)
 
-## Install rChambua from Github, and load it
-#install.packages("rChambua")
-library("rChambua")
 
 ```
 
@@ -100,20 +97,12 @@ for( i in 1:length(Questions)){
 
 ```
 
-### 3. Using sapply(). 
+### 3. Using lapply(). 
 
-Okay sapply() is kind of usually moody at times, and this was one of those days. So I used lapply, and it works.
+sapply() is kind of usually moody at times, and this was one of those days. So I used lapply(), and it works.
 <br>
 
 ```{r,warning=FALSE, message=FALSE}
-
-# factor_function <- function(data,var){
-#   data[,var] <- factor(data[,var],
-#                   levels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"),
-#                   labels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"))
-#   
-#   return(data[,var])
-# }
 
 opinion_df <- data.frame(opinion_df)
 
@@ -121,27 +110,33 @@ opinion_df4 <- as.data.frame(lapply(opinion_df, function(x) factor(x,
             levels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"),
             labels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"))),check.names = FALSE)
 
+levels(opinion_df3$Opinion_4)
 
 ```
 
-### 4. Using purrr::map()
+### 4. Using forcats::fct_relevel()
+<br>
+```{r}
+
+opinion_df5 <- opinion_df %>%
+  dplyr::mutate_all(forcats::fct_relevel, "Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree")
+
+levels(opinion_df5$Opinion_4)
+```
+
+
+### 5. Using purrr::map()
 <br>
 The syntax is written  as map(.x,.f) i.e for each element of .x, do .f
 <br> 
 ```{r,warning=FALSE, message=FALSE}
 
-opinion_df5 <-bind_rows(map(opinion_df, ~factor(.x,
+opinion_df6 <-bind_rows(map(opinion_df, ~factor(.x,
  levels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"),
  labels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"))))
 
-```
 
-### 5. Using forcats::fct_relevel()
-<br>
-```{r}
-
-opinion_df6 <- opinion_df %>%
-  dplyr::mutate_all(forcats::fct_relevel, "Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree")
+levels(opinion_df6$Opinion_4)
 
 ```
 
