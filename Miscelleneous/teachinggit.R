@@ -62,7 +62,7 @@ Q4 <-c(1122,1479,889,1174,1317)
 sales = data.frame(Year,Q1 ,Q2, Q3, Q4)
 
 ## Question X.1 Calculate the total sales per year.
-
+## The class discussed how to do this
 
 ## Question X.2 Calculate the average sales per quarter.
 
