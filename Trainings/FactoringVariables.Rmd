@@ -5,7 +5,7 @@ date: <strong><center>1/15/2020</strong></center>
 output: html_document
 ---
 
-There are 5 ways (that I know of) in which we can factorise multiple  variables in R.
+There are 5 ways (that I know of) in which we can factorise multiple variables in R.
 
 + One by one (an option for beginners).
 + Using a for loop.
@@ -63,9 +63,16 @@ head(opinion_df, 10)
 opinion_df2 <- opinion_df
 
 ## Opinion_1
-opinion_df2$Opinion_1 <- factor(opinion_df2$Opinion_1,
-                                levels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"),
-                                labels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"))
+# opinion_df2$Opinion_1 <- factor(opinion_df2$Opinion_1,
+#           levels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"),
+#           labels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"))
+# 
+
+opinion_df <- opinion_df %>% 
+  mutate(Opinion_1 = 
+  factor(Opinion_1, 
+         levels = c("Strongly Disagree","Disagree","Neutral","Agree","Strongly Agree"),
+         labels = c("Strongly Disagree","Disagree","Neutral","Agree","Strongly Agree")))
 
 ## Opinion_2
 opinion_df2$Opinion_2 <- factor(opinion_df2$Opinion_2,
@@ -110,7 +117,7 @@ opinion_df4 <- as.data.frame(lapply(opinion_df, function(x) factor(x,
             levels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"),
             labels = c("Strongly Disagree", "Disagree","Neutral","Agree", "Strongly Agree"))),check.names = FALSE)
 
-levels(opinion_df3$Opinion_4)
+levels(opinion_df4$Opinion_4)
 
 ```
 
@@ -122,6 +129,16 @@ opinion_df5 <- opinion_df %>%
   dplyr::mutate_all(forcats::fct_relevel, "Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree")
 
 levels(opinion_df5$Opinion_4)
+
+
+
+
+opinion_df5b <- opinion_df %>% 
+  mutate(Opinion_4 = fct_relevel(Opinion_4,"Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"))
+
+opinion_df5b <- opinion_df %>% 
+  mutate(Opinion_5 = fct_relevel(Opinion_5, "Strongly Agree","Agree","Neutral","Disagree","Strongly Disagree"))
+
 ```
 
 

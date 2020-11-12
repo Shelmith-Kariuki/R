@@ -20,11 +20,11 @@ library(rChambua)
 df <- wafanyikazi
   
 ##  2. Writing a function that displays the frequencies of each of the categorical variables.
-# freq_func <- function(dataframe, var){
-#   tab <- dataframe %>% 
-#     group_by({{ var }}) %>% 
-#     count(name = "Frequency")
-# }
+freq_func <- function(dataframe, var){
+  tab <- dataframe %>%
+    group_by({{ var }}) %>%
+    count(name = "Frequency")
+}
 
 freq_func <- function(dataframe, var){
   

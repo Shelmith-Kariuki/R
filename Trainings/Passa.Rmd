@@ -31,14 +31,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Load the packages required
 
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 #install.packages("tidyverse")
 library(tidyverse)
 library(rChambua)## Contains the dataset that we will use in this script (Wafanyikazi dataset)
 ```
 
 <br>
-```{r,warning=FALSE, message=FALSE}
+```{r,warning=FALSE, message=FALSE, fig.width =12}
 ### 0.1 Install the libraries required
 ## Create a vector of packages to be installed
 pkgs <- c("tidyverse","data.table","DT","lubridate","ggthemes","randomForest","readODS","ggcorrplot")
@@ -62,7 +62,7 @@ rm(pkgs)
 
 ## Read in the wafanyikazi dataset
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 df <- wafanyikazi
 
@@ -76,7 +76,7 @@ Contains several functions, which we will look at one by one.
 
 Used for picking and dropping variables.
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 ## Picking variables.
 
@@ -124,7 +124,7 @@ filter works with mathematical operators.
 In english grammar, filter means removing unwanted material. But in R, we mostly use filter to keep observations, depending on the mathematical operators used.
 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 ## Dropping obsevations based on the condition of a numeric variable. 
 
 ### Let us drop all those who are aged 25 and above
@@ -156,7 +156,7 @@ rm(df2)
 
 Used for generating variables
 
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 ## Generating a basic variable.
 df3 <- df %>% 
@@ -180,7 +180,7 @@ mutate_if(): Used for implementing a function, on specific variables, if they me
 
 The syntax is written as `mutate_all(~(function(.)))`. In the function, where a variable name should be inserted, replace that with a "period", to signify all the variables.
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 df4 <- df %>% 
   mutate_all(~paste0(., "_x"))
 
@@ -196,7 +196,7 @@ rm(df4)
 The syntax is written as `mutate_at(vars(), funs(.))` 
 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 df4 <- df %>% 
   mutate_at(vars(Gender, County), tolower)
 
@@ -213,7 +213,7 @@ rm(df4)
 
 The syntax is written as `mutate_if(condition, funs(.))` 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 df4 <- df %>% 
   mutate_if(is.numeric, funs(.*100))
 
@@ -230,7 +230,7 @@ rm(df4)
 Used for generating summary statistics. 
 <br>
 
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 tab <- df %>% 
   group_by(Gender) %>% 
@@ -250,7 +250,7 @@ tab <- df %>%
 
 #### 1.4.2 summarise_at
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 tab <- df %>% 
   group_by(County) %>% 
   summarise_at(vars(Age, Leave_Days, Income), funs(mean(.,na.rm = TRUE)))
@@ -260,7 +260,7 @@ tab <- df %>%
 #### 1.4.2 summarise_if
 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 tab <- df %>% 
   group_by(County,Gender) %>% 
@@ -272,7 +272,7 @@ tab <- df %>%
 
 Used for ordering the data based on certain variables 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 df6 <- df %>% 
   arrange(Gender, Age)
@@ -283,7 +283,7 @@ df6 <- df %>%
 
 ##2. tidyr
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 ## Generatin a dummy dataset
 Year <- c(2010,2011,2012,2013,2014)
 Q1 <-c(1003,1532,954,841,823)
@@ -297,7 +297,7 @@ sales = data.frame(Year,Q1 ,Q2, Q3, Q4)
 
 ### 2.1 Wider to longer
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 ## Method 1: Using gather()
 
 sales1 <- sales %>% 
@@ -310,7 +310,7 @@ sales2 <- sales %>%
 
 ### 2.2 Longer to wider
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 ## Method 1: Using spread()
 sales3 <- sales1 %>% 
@@ -327,7 +327,7 @@ sales4 <- sales2 %>%
 
 Used for creating beautiful graphs
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 ## Let us create a theme that we will use in this training
 
 training_theme <- theme_hc()+ 
@@ -348,7 +348,7 @@ rstudio_blue <- "#4AA4DE"
 ### 3.1 geom_bar of one variable
 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 ## Let us generate a graph that sows us the number of individuals per department.
 
@@ -377,7 +377,7 @@ bargraph1
 
 <br>
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 ## Let us generate a graph that sows us the number of individuals per department and gender category.
 
@@ -406,7 +406,7 @@ bargraph2
 ### 3.3 geom_line of one variable
 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 ## Let us generate a graph that sows us the average income per department.
 
@@ -430,7 +430,7 @@ linegraph1
 ### 3.4 geom_line of 2 variables
 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 ## Let us generate a graph that sows us the average income per department and gender.
 
@@ -454,7 +454,7 @@ linegraph2
 ### 3.5 geom_boxplot of one variable
 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 ## Let us generate a graph that sows us the average income per department.
 
@@ -471,7 +471,7 @@ boxplot1
 ### 3.6 geom_boxplot of two variables
 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 ## Let us generate a graph that sows us the average income per department and gender.
 
@@ -489,7 +489,7 @@ boxplot2
 ### 3.7 geom_area of one variable
 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 ## Let us generate a graph that sows us the average income per department and gender.
 
@@ -506,7 +506,7 @@ area1
 ### 3.8 geom_area of two variables
 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 ## Let us generate a graph that sows us the average income per department and gender.
 
@@ -525,7 +525,7 @@ area2
 ### 3.9 geom_histogram of one variable
 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 ## Let us generate a graph that sows us the average income per department and gender.
 
@@ -542,7 +542,7 @@ hist1
 ### 3.10 geom_histogram of two variables
 
 <br>
-```{r ,warning=FALSE, message=FALSE}
+```{r ,warning=FALSE, message=FALSE, fig.width =12}
 
 ## Let us generate a graph that sows us the average income per department and gender.
 
