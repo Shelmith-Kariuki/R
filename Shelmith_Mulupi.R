@@ -26,4 +26,3 @@ df  <- df %>%
 # df  <- df %>% 
 #   mutate(across(c(day_of_week, home_ownership), ~as.numeric(.)))
 
-reprex()
