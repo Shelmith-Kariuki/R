@@ -395,11 +395,16 @@ summary {
 <li><a href="#part-1-1">Part 1:</a></li>
 <li><a href="#part-2-1">Part 2:</a></li>
 </ul></li>
+<li><a href="#day-4-passport-processing">Day 4: Passport Processing</a><ul>
+<li><a href="#part-1-2">Part 1:</a></li>
+<li><a href="#part-2-2">Part 2:</a></li>
+</ul></li>
 </ul>
 </div>
 
 <pre class="r"><code>## Load the packages required
-library(tidyverse)</code></pre>
+library(tidyverse)
+library(zoo)</code></pre>
 <style>
 body {text-align: justify}
 </style>
@@ -461,7 +466,7 @@ result2 &lt;- tab2 %&gt;%
 <p>1-3 a: abcde 1-3 b: cdefg 2-9 c: ccccccccc Each line gives the password policy and then the password. The password policy indicates the lowest and highest number of times a given letter must appear for the password to be valid. For example, 1-3 a means that the password must contain a at least 1 time and at most 3 times.</p>
 <p>In the above example, 2 passwords are valid. The middle password, cdefg, is not; it contains no instances of b, but needs at least 1. The first and third passwords are valid: they contain one a or nine c, both within the limits of their respective policies.</p>
 <p><strong>How many passwords are valid according to their policies?</strong></p>
-<pre class="r"><code>## Read in the data
+<pre class="r"><code>## Read in the datasets
 df &lt;- read.table(&quot;Day2/input_day2.txt&quot;)
 
 ## Rename the columns into `condition`, `letter`, `password`
@@ -527,6 +532,197 @@ valid_passwords2 &lt;- df2 %&gt;%
   select(validity) %&gt;% 
   count() %&gt;% 
   pull(n)</code></pre>
+</div>
+</div>
+<div id="day-4-passport-processing" class="section level2">
+<h2>Day 4: Passport Processing</h2>
+<div id="part-1-2" class="section level3">
+<h3>Part 1:</h3>
+<p>You arrive at the airport only to realize that you grabbed your North Pole Credentials instead of your passport. While these documents are extremely similar, North Pole Credentials aren’t issued by a country and therefore aren’t actually valid documentation for travel in most of the world.</p>
+<p>It seems like you’re not the only one having problems, though; a very long line has formed for the automatic passport scanners, and the delay could upset your travel itinerary.</p>
+<p>Due to some questionable network security, you realize you might be able to solve both of these problems at the same time.</p>
+<p>The automatic passport scanners are slow because they’re having trouble detecting which passports have all required fields. The expected fields are as follows:</p>
+<p>byr (Birth Year)</p>
+<p>iyr (Issue Year)</p>
+<p>eyr (Expiration Year)</p>
+<p>hgt (Height)</p>
+<p>hcl (Hair Color)</p>
+<p>ecl (Eye Color)</p>
+<p>pid (Passport ID)</p>
+<p>cid (Country ID)</p>
+<p>Passport data is validated in batch files (your puzzle input). Each passport is represented as a sequence of key:value pairs separated by spaces or newlines. Passports are separated by blank lines.</p>
+<p>Here is an example batch file containing four passports:</p>
+<p>ecl:gry pid:860033327 eyr:2020 hcl:#fffffd byr:1937 iyr:2017 <a href="cid:147" class="uri">cid:147</a> hgt:183cm</p>
+<p>iyr:2013 ecl:amb <a href="cid:350" class="uri">cid:350</a> eyr:2023 pid:028048884 hcl:#cfa07d byr:1929</p>
+<p>hcl:#ae17e1 iyr:2013 eyr:2024 ecl:brn pid:760753108 byr:1931 hgt:179cm</p>
+<p>hcl:#cfa07d eyr:2025 pid:166559648 iyr:2011 ecl:brn hgt:59in The first passport is valid - all eight fields are present. The second passport is invalid - it is missing hgt (the Height field).</p>
+<p>The third passport is interesting; the only missing field is cid, so it looks like data from North Pole Credentials, not a passport at all! Surely, nobody would mind if you made the system temporarily ignore missing cid fields. Treat this “passport” as valid.</p>
+<p>The fourth passport is missing two fields, cid and byr. Missing cid is fine, but missing any other field is not, so this passport is invalid.</p>
+<p>According to the above rules, your improved system would report 2 valid passports.</p>
+<p><strong>Count the number of valid passports - those that have all required fields. Treat cid as optional. In your batch file, how many passports are valid?</strong></p>
+<pre class="r"><code>## Read in the data
+df &lt;- data.frame(V1 = read_lines(&quot;Day4/input_day4.txt&quot;))
+
+## Generate a variable that shows the passport id
+df2 &lt;- df %&gt;% 
+  mutate(blank = ifelse(V1 == &quot;&quot;, &quot;blank&quot;, NA)) %&gt;% 
+  mutate(counter = seq_along(blank),
+         passportid = ifelse(blank == &quot;blank&quot;, paste0(blank, counter),NA),
+         passportid = na.locf0(passportid, fromLast = TRUE)) %&gt;% 
+  filter(blank != &quot;blank&quot; |is.na(blank)) %&gt;% 
+  select(-blank, -counter) 
+
+## Collapse the records into one record
+df2 &lt;- df2 %&gt;% 
+  group_by(passportid) %&gt;% 
+  mutate(single_record = paste(V1, collapse = &quot; &quot;)) %&gt;% 
+  distinct(passportid, single_record)
+
+## Separate the record into different variables
+df2 &lt;- df2 %&gt;% 
+  separate(single_record, into = paste0(&quot;C_&quot;, 1:8), sep = &quot; &quot;)
+
+## Reshape the data
+df2 &lt;- df2 %&gt;% 
+  pivot_longer(names_to = &quot;field_no&quot;, 
+               values_to = &quot;field&quot;, 
+               cols = starts_with(&quot;C_&quot;),
+               values_drop_na = TRUE)
+
+## Separate the field into field_name and field_value
+df2 &lt;- df2 %&gt;% 
+  separate(field, into = c(&quot;field_name&quot;, &quot;field_value&quot;), sep = &quot;:&quot;) %&gt;% 
+  mutate(field_name = trimws(field_name)) %&gt;% 
+  select(-field_no)
+
+## Generate a variable that counts the number of fields per passport id
+df2 &lt;- df2 %&gt;% 
+  group_by(passportid) %&gt;% 
+  mutate(field_count = length(unique(field_name)))
+
+## Check validity
+df2 &lt;- df2 %&gt;% 
+  group_by(passportid) %&gt;% 
+  mutate(validity = ifelse(field_count == 8, &quot;valid&quot;,
+                           ifelse(field_count == 7 &amp; any(field_name == &quot;cid&quot;) == FALSE, 
+                                  &quot;valid&quot;, &quot;invalid&quot;))) 
+
+## Calculate the number of valid passports
+valid_passports1 &lt;- df2 %&gt;% 
+  distinct(passportid, validity) %&gt;% 
+  group_by(validity) %&gt;% 
+  count() %&gt;% 
+  filter(validity == &quot;valid&quot;) %&gt;% 
+  pull(n)</code></pre>
+</div>
+<div id="part-2-2" class="section level3">
+<h3>Part 2:</h3>
+<p>The line is moving more quickly now, but you overhear airport security talking about how passports with invalid data are getting through. Better add some data validation, quick!</p>
+<p>You can continue to ignore the cid field, but each other field has strict rules about what values are valid for automatic validation:</p>
+<p>byr (Birth Year) - four digits; at least 1920 and at most 2002.</p>
+<p>iyr (Issue Year) - four digits; at least 2010 and at most 2020.</p>
+<p>eyr (Expiration Year) - four digits; at least 2020 and at most 2030.</p>
+<p>hgt (Height) - a number followed by either cm or in:</p>
+<p>If cm, the number must be at least 150 and at most 193.</p>
+<p>If in, the number must be at least 59 and at most 76.</p>
+<p>hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.</p>
+<p>ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.</p>
+<p>pid (Passport ID) - a nine-digit number, including leading zeroes.</p>
+<p>cid (Country ID) - ignored, missing or not.</p>
+<p>Your job is to count the passports where all required fields are both present and valid according to the above rules. Here are some example values:</p>
+<p>byr valid: 2002</p>
+<p>byr invalid: 2003</p>
+<p>hgt valid: 60in</p>
+<p>hgt valid: 190cm</p>
+<p>hgt invalid: 190in</p>
+<p>hgt invalid: 190</p>
+<p>hcl valid: #123abc</p>
+<p>hcl invalid: #123abz</p>
+<p>hcl invalid: 123abc</p>
+<p>ecl valid: brn</p>
+<p>ecl invalid: wat</p>
+<p>pid valid: 000000001</p>
+<p>pid invalid: 0123456789</p>
+<p>Here are some invalid passports:</p>
+<p>eyr:1972 <a href="cid:100" class="uri">cid:100</a></p>
+<p>hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926</p>
+<p>iyr:2019</p>
+<p>hcl:#602927 eyr:1967 hgt:170cm</p>
+<p>ecl:grn pid:012533040 byr:1946</p>
+<p>hcl:dab227 iyr:2012</p>
+<p>ecl:brn hgt:182cm pid:021572410 eyr:2020 byr:1992 <a href="cid:277" class="uri">cid:277</a></p>
+<p>hgt:59cm ecl:zzz</p>
+<p>eyr:2038 hcl:74454a iyr:2023</p>
+<p>pid:3556412378 byr:2007</p>
+<p>Here are some valid passports:</p>
+<p>pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980 hcl:#623a2f</p>
+<p>eyr:2029 ecl:blu <a href="cid:129" class="uri">cid:129</a> byr:1989 iyr:2014 pid:896056539 hcl:#a97842 hgt:165cm</p>
+<p>hcl:#888785 hgt:164cm byr:2001 iyr:2015 <a href="cid:88" class="uri">cid:88</a> pid:545766238 ecl:hzl eyr:2022</p>
+<p>iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719</p>
+<p><strong>Count the number of valid passports - those that have all required fields and valid values. Continue to treat cid as optional. In your batch file, how many passports are valid?</strong></p>
+<pre class="r"><code># Conditions: 
+## byr (Birth Year) - four digits; at least 1920 and at most 2002.
+## iyr (Issue Year) - four digits; at least 2010 and at most 2020.
+## eyr (Expiration Year) - four digits; at least 2020 and at most 2030.
+## hgt (Height) - a number followed by either cm or in:
+##   If cm, the number must be at least 150 and at most 193.
+## If in, the number must be at least 59 and at most 76.
+## hcl (Hair Color) - a ## followed by exactly six characters 0-9 or a-f.
+## ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
+## pid (Passport ID) - a nine-digit number, including leading zeroes.
+## cid (Country ID) - ignored, missing or not.
+
+df3 &lt;- df2 %&gt;% 
+  mutate(field_value = trimws(field_value)) %&gt;% 
+  mutate(validity2 = 
+           # byr (Birth Year) - four digits; at least 1920 and at most 2002.
+           ifelse(field_name == &quot;byr&quot; &amp; nchar(field_value) == 4 &amp; 
+                  between(as.numeric(field_value), 1920, 2002), &quot;okay&quot;,
+           # iyr (Issue Year) - four digits; at least 2010 and at most 2020. 
+          ifelse(field_name == &quot;iyr&quot; &amp; nchar(field_value) == 4 &amp; 
+                 between(as.numeric(field_value), 2010, 2020), &quot;okay&quot;, 
+                  
+          # eyr (Expiration Year) - four digits; at least 2020 and at most 2030. 
+          ifelse(field_name == &quot;eyr&quot; &amp; nchar(field_value) == 4 &amp; 
+                 between(as.numeric(field_value), 2020, 2030), &quot;okay&quot;,
+          # hgt (Height) - a number followed by either cm or in:
+          # If &quot;cm&quot;, the number must be at least 150 and at most 193.       
+          ifelse(field_name == &quot;hgt&quot; &amp; 
+                 field_value %in% grep(&quot;cm&quot;, field_value, ignore.case = TRUE, value = TRUE) &amp;
+                 between(as.numeric(trimws(gsub(&quot;cm&quot;,&quot;&quot;, field_value))), 150, 193),&quot;okay&quot;,
+          
+          # If &quot;in&quot;, the number must be at least 59 and at most 76.
+          ifelse(field_name == &quot;hgt&quot; &amp; 
+                           field_value %in% grep(&quot;in&quot;, field_value,ignore.case = TRUE, value = TRUE) &amp;
+                           between(as.numeric(trimws(gsub(&quot;in&quot;,&quot;&quot;, field_value))), 59, 76),&quot;okay&quot;,
+                 
+          # hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
+          ifelse(field_name == &quot;hcl&quot; &amp; 
+                   field_value %in% grep(&quot;#&quot;, field_value,ignore.case = TRUE, value = TRUE) &amp;
+                   nchar(field_value) == 7, &quot;okay&quot;,
+                 
+          # ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
+          ifelse(field_name == &quot;ecl&quot; &amp; 
+                   field_value %in% c(&quot;amb&quot;, &quot;blu&quot;, &quot;brn&quot;, &quot;gry&quot;, &quot;grn&quot;, &quot;hzl&quot;, &quot;oth&quot;) &amp;
+                   nchar(field_value) == 3, &quot;okay&quot;,
+                   
+          # pid (Passport ID) - a nine-digit number, including leading zeroes.
+          ifelse(field_name == &quot;pid&quot; &amp; nchar(gsub(&quot;[^0-9]+&quot;, &quot;&quot;, field_value)) == 9, &quot;okay&quot;,
+          
+          # cid (Country ID) - ignored, missing or not. 
+          ifelse(field_name == &quot;cid&quot;, &quot;okay&quot;,  &quot;invalid&quot;)))))))))) %&gt;% 
+  
+  mutate(final_validity = ifelse(all(validity == &quot;valid&quot;) &amp; all(validity2 == &quot;okay&quot;),
+                                 &quot;valid&quot;, &quot;invalid&quot;))
+     
+
+## Calculate the number of valid passports
+valid_passports2 &lt;- df3 %&gt;% 
+  distinct(passportid, final_validity) %&gt;% 
+  group_by(final_validity) %&gt;% 
+  count() %&gt;% 
+  filter(final_validity == &quot;valid&quot;) %&gt;% 
+  pull(n)  </code></pre>
 </div>
 </div>
 
